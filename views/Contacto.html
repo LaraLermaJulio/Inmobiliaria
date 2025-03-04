@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - Inmobiliaria</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/contacto.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Inmobiliaria</div>
+        <ul class="nav-links">
+            <li><a href="../Index.html">Inicio</a></li>
+            <li><a href="Ventas.html">Ventas</a></li>
+            <li><a href="Renta.html">Renta</a></li>
+            <li><a href="Nosotros.html">Nosotros</a></li>
+            <li><a href="Contacto.html">Contacto</a></li>
+        </ul>
+    </nav>
+    
+    <section class="contact-container">
+        <h1>Contáctanos</h1>
+        
+        <div class="contact-content">
+            <div class="contact-info">
+                <div class="contact-card">
+                    <div class="icon-container">
+                        <i class="contact-icon location-icon"></i>
+                    </div>
+                    <h3>Ubicación</h3>
+                    <p>Av. Principal #123</p>
+                    <p>Colonia Centro, CP 12345</p>
+                    <p>Ciudad, Estado</p>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="icon-container">
+                        <i class="contact-icon phone-icon"></i>
+                    </div>
+                    <h3>Teléfonos</h3>
+                    <p>Oficina: (123) 456-7890</p>
+                    <p>Ventas: (123) 456-7891</p>
+                    <p>WhatsApp: (123) 456-7892</p>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="icon-container">
+                        <i class="contact-icon email-icon"></i>
+                    </div>
+                    <h3>Correo Electrónico</h3>
+                    <p>info@inmobiliaria.com</p>
+                    <p>ventas@inmobiliaria.com</p>
+                    <p>soporte@inmobiliaria.com</p>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="icon-container">
+                        <i class="contact-icon clock-icon"></i>
+                    </div>
+                    <h3>Horario de Atención</h3>
+                    <p>Lunes a Viernes: 9:00 - 18:00</p>
+                    <p>Sábados: 9:00 - 14:00</p>
+                    <p>Domingos: Cerrado</p>
+                </div>
+            </div>
+            
+            <div class="contact-form-container">
+                <h2>Envíanos un Mensaje</h2>
+                <p class="form-intro">Completa el siguiente formulario y nos pondremos en contacto contigo lo antes posible.</p>
+                
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label for="nombre">Nombre completo:</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre completo" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Correo electrónico:</label>
+                        <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="telefono">Teléfono:</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="(123) 456-7890">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="asunto">Asunto:</label>
+                        <select id="asunto" name="asunto" required>
+                            <option value="" disabled selected>Selecciona un asunto</option>
+                            <option value="compra">Información sobre compra</option>
+                            <option value="venta">Información sobre venta</option>
+                            <option value="renta">Información sobre renta</option>
+                            <option value="visita">Agendar una visita</option>
+                            <option value="otro">Otro asunto</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mensaje">Mensaje:</label>
+                        <textarea id="mensaje" name="mensaje" placeholder="Describe tu consulta o solicitud en detalle..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="privacidad" name="privacidad" required>
+                        <label for="privacidad">He leído y acepto la <a href="#" class="privacy-link">política de privacidad</a>.</label>
+                    </div>
+                    
+                    <button type="submit" class="submit-button">Enviar mensaje</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="map-container">
+            <h2>Nuestra Ubicación</h2>
+            <div class="map-placeholder">
+               
+                <img src="../imgs/placeholder-map.jpg" alt="Mapa de ubicación" class="map-image">
+            </div>
+        </div>
+        
+        <div class="social-container">
+            <h2>Síguenos en Redes Sociales</h2>
+            <div class="social-icons">
+                <a href="#" class="social-icon facebook-icon" title="Facebook"></a>
+                <a href="#" class="social-icon instagram-icon" title="Instagram"></a>
+                <a href="#" class="social-icon twitter-icon" title="Twitter"></a>
+                
+            </div>
+        </div>
+        
+       
+        
+        <div class="privacy-section">
+            <h2>Aviso de Privacidad</h2>
+            <p>La información proporcionada a través de este sitio web será tratada con absoluta confidencialidad de acuerdo con nuestra política de privacidad. Tus datos personales serán utilizados únicamente para los fines específicos para los que fueron proporcionados y no serán compartidos con terceros sin tu consentimiento explícito.</p>
+            <p>Para más información sobre cómo manejamos tus datos, consulta nuestra <a href="#" class="privacy-link">política de privacidad completa</a>.</p>
+        </div>
+    </section>
+    
+    <footer class="footer">
+        <p>&copy; 2025 Inmobiliaria. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>

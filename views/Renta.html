@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inmobiliaria - Renta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/catalogo.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Inmobiliaria</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Inicio</a></li>
+            <li><a href="Ventas.html">Ventas</a></li>
+            <li><a href="Renta.html" class="active">Renta</a></li>
+            <li><a href="Nosotros.html">Nosotros</a></li>
+            <li><a href="Contacto.html">Contacto</a></li>
+        </ul>
+        <div class="user-profile">
+            <img src="profile.jpg" alt="Perfil del usuario">
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>Propiedades en Renta</h1>
+    </div>
+
+    <div class="catalog-container">
+        <aside class="filters-sidebar">
+            <div class="filter-section">
+                <h3>Filtros</h3>
+                
+                <div class="filter-group">
+                    <label for="location">Ubicación</label>
+                    <select id="location">
+                        <option value="">Todas las ubicaciones</option>
+                        <option value="centro">Centro</option>
+                        <option value="norte">Zona Norte</option>
+                        <option value="sur">Zona Sur</option>
+                        <option value="este">Zona Este</option>
+                        <option value="oeste">Zona Oeste</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="price-min">Precio Mensual</label>
+                    <div class="price-inputs">
+                        <input type="number" id="price-min" placeholder="Mínimo">
+                        <span>-</span>
+                        <input type="number" id="price-max" placeholder="Máximo">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Habitaciones</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" value="1"> 1</label>
+                        <label><input type="checkbox" value="2"> 2</label>
+                        <label><input type="checkbox" value="3"> 3</label>
+                        <label><input type="checkbox" value="4"> 4+</label>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Baños</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" value="1"> 1</label>
+                        <label><input type="checkbox" value="2"> 2</label>
+                        <label><input type="checkbox" value="3"> 3+</label>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="property-type">Tipo de propiedad</label>
+                    <select id="property-type">
+                        <option value="">Todos los tipos</option>
+                        <option value="casa">Casa</option>
+                        <option value="departamento">Departamento</option>
+                        <option value="comercial">Local Comercial</option>
+                        <option value="oficina">Oficina</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="area-min">Superficie (m²)</label>
+                    <div class="price-inputs">
+                        <input type="number" id="area-min" placeholder="Mínimo">
+                        <span>-</span>
+                        <input type="number" id="area-max" placeholder="Máximo">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Características</label>
+                    <div class="checkbox-group vertical">
+                        <label><input type="checkbox" value="amueblada"> Amueblada</label>
+                        <label><input type="checkbox" value="mascota"> Acepta Mascotas</label>
+                        <label><input type="checkbox" value="estacionamiento"> Estacionamiento</label>
+                        <label><input type="checkbox" value="seguridad"> Seguridad 24h</label>
+                    </div>
+                </div>
+                
+                <button class="apply-filters-btn">Aplicar Filtros</button>
+                <button class="reset-filters-btn">Restablecer</button>
+            </div>
+        </aside>
+        
+        <main class="properties-grid">
+            <div class="property-item">
+                <div class="property-image">
+                    <img src="../imgs/CHANTE1.jpg" alt="Casa en venta">
+                    <span class="property-tag">Venta</span>
+                </div>
+                <div class="property-info">
+                    <h3>Granadita de uriangato</h3>
+                    <p class="property-price">$40,500 /mes</p>
+                    <p class="property-location">Uriangato, Guanajuato</p>
+                    <div class="property-features">
+                        <span>30 Habitaciones</span>
+                        <span>20 Baños</span>
+                        <span>11080 m²</span>
+                        <span>2 Estacionamientos</span>
+                    </div>
+                    <a href="#" class="view-details-btn">Ver Detalles</a>
+                </div>
+            </div>
+            
+            <div class="property-item">
+                <div class="property-image">
+                    <img src="../imgs/CHANTE2.jpg" alt="Departamento en venta">
+                    <span class="property-tag">Venta</span>
+                </div>
+                <div class="property-info">
+                    <h3>Castillo de uriangato</h3>
+                    <p class="property-price">$50,800 /mes</p>
+                    <p class="property-location">Uriangato, Guanajuato</p>
+                    <div class="property-features">
+                        <span>20 Habitaciones</span>
+                        <span>11 Baño</span>
+                        <span>95000 m²</span>
+                        <span>1 Estacionamiento</span>
+                    </div>
+                    <a href="#" class="view-details-btn">Ver Detalles</a>
+                </div>
+            </div>
+            
+            <div class="property-item">
+                <div class="property-image">
+                    <img src="../imgs/CHANTE3.jpg" alt="Terreno en venta">
+                    <span class="property-tag">Venta</span>
+                </div>
+                <div class="property-info">
+                    <h3>Castillo de Moroleon</h3>
+                    <p class="property-price">$100,250 /mes</p>
+                    <p class="property-location">Moroleon, Guanajuato</p>
+                    <div class="property-features">
+                        <span>5000000 m²</span>
+                        <span>Uso habitacional</span>
+                        <span>Todos los servicios</span>
+                    </div>
+                    <a href="#" class="view-details-btn">Ver Detalles</a>
+                </div>
+            </div>
+            
+            <div class="property-item">
+                <div class="property-image">
+                    <img src="../imgs/CHANTE4.jpg" alt="Casa en venta">
+                    <span class="property-tag tag-featured">Destacado</span>
+                </div>
+                <div class="property-info">
+                    <h3>Residencia con Jardín</h3>
+                    <p class="property-price">$50,800 /mes</p>
+                    <p class="property-location">Zapopan, Jalisco</p>
+                    <div class="property-features">
+                        <span>40 Habitaciones</span>
+                        <span>13 Baños</span>
+                        <span>320000 m²</span>
+                        <span>3 Estacionamientos</span>
+                    </div>
+                    <a href="#" class="view-details-btn">Ver Detalles</a>
+                </div>
+            </div>
+
+            <div class="property-item">
+                <div class="property-image">
+                    <img src="../imgs/CHANTE5.jpg" alt="Local comercial en venta">
+                    <span class="property-tag">Venta</span>
+                </div>
+                <div class="property-info">
+                    <h3>Local Comercial Centro</h3>
+                    <p class="property-price">$3,200 /mes</p>
+                    <p class="property-location">Guadalajara, Jalisco</p>
+                    <div class="property-features">
+                        <span>1200000 m²</span>
+                        <span>15 Baño</span>
+                        <span>Zona comercial</span>
+                    </div>
+                    <a href="#" class="view-details-btn">Ver Detalles</a>
+                </div>
+            </div>
+            
+            <div class="property-item">
+                <div class="property-image">
+                    <img src="../imgs/CHANTE6.jpg" alt="Casa en venta">
+                    <span class="property-tag tag-new">Nueva</span>
+                </div>
+                <div class="property-info">
+                    <h3>Castillo en Fraccionamiento</h3>
+                    <p class="property-price">$300,500 /mes</p>
+                    <p class="property-location">Moroleon, Guanajuato</p>
+                    <div class="property-features">
+                        <span>30 Habitaciones</span>
+                        <span>25 Baños</span>
+                        <span>160000 m²</span>
+                        <span>2 Estacionamientos</span>
+                    </div>
+                    <a href="#" class="view-details-btn">Ver Detalles</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    
+</body>
+</html>
