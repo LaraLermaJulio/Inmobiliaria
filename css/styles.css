@@ -40,8 +40,8 @@ body {
 }
 
 .user-profile img {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: auto;
     border-radius: 50%;
 }
 
