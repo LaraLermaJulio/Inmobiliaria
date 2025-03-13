@@ -91,6 +91,33 @@ body {
     color: #121210;
     cursor: pointer;
 }
+
+@media (max-width: 600px) {
+    .search-bar {
+        width: 90%;
+        max-width: 400px;
+        flex-direction: column;
+    }
+    
+    .search-bar input {
+        width: 100%;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+    
+    .search-bar button {
+        width: 100%;
+    }
+    
+    .hero-text h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-text p {
+        font-size: 1rem;
+    }
+}
+
 /* Featured Properties */
 .featured-properties {
     padding: 40px 20px;

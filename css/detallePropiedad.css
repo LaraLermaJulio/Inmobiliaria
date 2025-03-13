@@ -477,3 +477,42 @@ body {
         padding: 15px;
     }
 }
+
+
+/* Update the action button styles */
+.action-button {
+    background-color: #4a362f;
+    color: #fff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: #635147;
+}
+
+.share-property {
+    width: 30%;
+    margin: 20px auto;
+    display: block;
+}
+
+@media screen and (max-width: 768px) {
+    .share-property {
+        width: 80%;
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .share-property {
+        width: 90%;
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+}
