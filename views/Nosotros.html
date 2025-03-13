@@ -12,14 +12,22 @@
 <body>
     <nav class="navbar">
         <div class="logo">Inmobiliaria</div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
         <ul class="nav-links">
-            <li><a href="../Index.html">Inicio</a></li>
+            <li class="mobile-profile">
+                <img src="../imgs/usuario.webp" alt="Perfil del usuario">
+            </li>
+            <li><a href="Index.html">Inicio</a></li>
             <li><a href="Ventas.html">Ventas</a></li>
             <li><a href="Renta.html">Renta</a></li>
             <li><a href="Nosotros.html">Nosotros</a></li>
             <li><a href="Contacto.html">Contacto</a></li>
         </ul>
-        <div class="user-profile">
+        <div class="user-profile desktop-only">
             <img src="../imgs/usuario.webp" alt="Perfil del usuario">
         </div>
     </nav>
@@ -111,5 +119,6 @@
         
         <p class="cta-text">¿Listo para encontrar tu próxima propiedad o vender tu inmueble? <a href="Contacto.html" class="cta-link">Contáctanos hoy mismo</a> y descubre la diferencia de trabajar con profesionales.</p>
     </section>
+    <script src="../js/hamburger.js"></script>
 </body>
 </html>
