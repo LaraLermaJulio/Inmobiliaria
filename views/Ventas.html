@@ -11,14 +11,22 @@
 <body>
     <nav class="navbar">
         <div class="logo">Inmobiliaria</div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
         <ul class="nav-links">
-            <li><a href="../index.html">Inicio</a></li>
-            <li><a href="ventas.html" class="active">Ventas</a></li>
-            <li><a href="renta.html">Renta</a></li>
+            <li class="mobile-profile">
+                <img src="../imgs/usuario.webp" alt="Perfil del usuario">
+            </li>
+            <li><a href="../Index.html">Inicio</a></li>
+            <li><a href="Ventas.html">Ventas</a></li>
+            <li><a href="Renta.html">Renta</a></li>
             <li><a href="Nosotros.html">Nosotros</a></li>
             <li><a href="Contacto.html">Contacto</a></li>
         </ul>
-        <div class="user-profile">
+        <div class="user-profile desktop-only">
             <img src="../imgs/usuario.webp" alt="Perfil del usuario">
         </div>
     </nav>
@@ -28,6 +36,7 @@
     </div>
 
     <div class="catalog-container">
+        <button class="filter-toggle" id="filterToggle">Mostrar Filtros</button>
         <aside class="filters-sidebar">
             <div class="filter-section">
                 <h3>Filtros</h3>
@@ -211,6 +220,7 @@
             </div>
         </main>
     </div>
-    
+    <script src="../js/filtroDespegable.js"></script>
+    <script src="../js/hamburger.js"></script>
 </body>
 </html>

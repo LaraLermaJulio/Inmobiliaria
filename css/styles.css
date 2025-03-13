@@ -212,3 +212,32 @@ body {
         transform: translateY(-8px) rotate(-45deg);
     }
 }
+
+/* Add these styles to your existing CSS */
+.mobile-profile {
+    display: none;
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-profile img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none;
+    }
+    
+    .mobile-profile {
+        display: block;
+    }
+    
+    .nav-links.active .mobile-profile {
+        display: block;
+    }
+}
