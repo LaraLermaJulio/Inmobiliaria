@@ -206,8 +206,8 @@ def custom_login(request):
         
         if user is not None:
             login(request, user)
-            # Redirect all users to admin
-            return redirect('/admin/')
+            # Redirect all users to index instead of admin
+            return redirect('index')
         else:
             # Return an error message for invalid login
             return render(request, 'real_estate/login.html', {
@@ -216,6 +216,21 @@ def custom_login(request):
             })
     
     return render(request, 'real_estate/login.html')
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                # Redirect all users (including admins) to index page
+                return redirect('index')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'real_estate/login.html', {'form': form})
 
 def detalle_propiedad(request, id):
     property = get_object_or_404(Property, id=id)
