@@ -1,0 +1,127 @@
+
+{% extends 'real_estate/base.html' %}
+{% load static %}
+
+{% block title %}Inmobiliaria - Ventas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Propiedades en Venta</h1>
+</div>
+
+<div class="catalog-container">
+    <button class="filter-toggle" id="filterToggle">Mostrar Filtros</button>
+    <aside class="filters-sidebar">
+        <div class="filter-section">
+            <h3>Filtros</h3>
+            <form method="get" action="{% url 'ventas' %}">
+                <div class="filter-group">
+                    <label for="location">Ubicación</label>
+                    <select id="location" name="location">
+                        <option value="">Todas las ubicaciones</option>
+                        {% for city in cities %}
+                            <option value="{{ city }}" {% if filters.location == city %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="price-min">Precio</label>
+                    <div class="price-inputs">
+                        <input type="number" id="price-min" name="price_min" placeholder="Mínimo" value="{{ filters.price_min }}">
+                        <span>-</span>
+                        <input type="number" id="price-max" name="price_max" placeholder="Máximo" value="{{ filters.price_max }}">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Habitaciones</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="bedrooms" value="1" {% if '1' in filters.bedrooms %}checked{% endif %}> 1</label>
+                        <label><input type="checkbox" name="bedrooms" value="2" {% if '2' in filters.bedrooms %}checked{% endif %}> 2</label>
+                        <label><input type="checkbox" name="bedrooms" value="3" {% if '3' in filters.bedrooms %}checked{% endif %}> 3</label>
+                        <label><input type="checkbox" name="bedrooms" value="4" {% if '4' in filters.bedrooms %}checked{% endif %}> 4+</label>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Baños</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="bathrooms" value="1" {% if '1' in filters.bathrooms %}checked{% endif %}> 1</label>
+                        <label><input type="checkbox" name="bathrooms" value="2" {% if '2' in filters.bathrooms %}checked{% endif %}> 2</label>
+                        <label><input type="checkbox" name="bathrooms" value="3" {% if '3' in filters.bathrooms %}checked{% endif %}> 3+</label>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="property-type">Tipo de propiedad</label>
+                    <select id="property-type" name="property_type">
+                        <option value="">Todos los tipos</option>
+                        <option value="casa" {% if filters.property_type == 'casa' %}selected{% endif %}>Casa</option>
+                        <option value="departamento" {% if filters.property_type == 'departamento' %}selected{% endif %}>Departamento</option>
+                        <option value="terreno" {% if filters.property_type == 'terreno' %}selected{% endif %}>Terreno</option>
+                        <option value="comercial" {% if filters.property_type == 'comercial' %}selected{% endif %}>Local Comercial</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="area-min">Superficie (m²)</label>
+                    <div class="price-inputs">
+                        <input type="number" id="area-min" name="area_min" placeholder="Mínimo" value="{{ filters.area_min }}">
+                        <span>-</span>
+                        <input type="number" id="area-max" name="area_max" placeholder="Máximo" value="{{ filters.area_max }}">
+                    </div>
+                </div>
+                
+                <button type="submit" class="apply-filters-btn">Aplicar Filtros</button>
+                <button type="button" class="reset-filters-btn" onclick="window.location.href='/ventas/'">Restablecer</button>
+            </form>
+        </div>
+    </aside>
+    
+    <main class="properties-grid">
+        {% if properties %}
+            {% for property in properties %}
+                <div class="property-item">
+                    <div class="property-image">
+                        {% if property.main_image %}
+                            <img src="{{ property.main_image.image.url }}" alt="{{ property.title }}">
+                        {% else %}
+                            <img src="{% static 'imgs/CHANTE1.jpg' %}" alt="{{ property.title }}">
+                        {% endif %}
+                        <span class="property-tag">Venta</span>
+                    </div>
+                    <div class="property-info">
+                        <h3>{{ property.title }}</h3>
+                        <p class="property-price">${{ property.price }} MXN</p>
+                        <p class="property-location">{{ property.city }}, {{ property.state }}</p>
+                        <div class="property-features">
+                            <span>{{ property.bedrooms }} Habitaciones</span>
+                            <span>{{ property.bathrooms }} Baños</span>
+                            <span>{{ property.area }} m²</span>
+                            {% if property.parking_spaces > 0 %}
+                                <span>{{ property.parking_spaces }} Estacionamientos</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'detalle_propiedad' property.id %}" class="view-details-btn">Ver Detalles</a>
+                        
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-properties">
+                <p>No hay propiedades en venta disponibles en este momento.</p>
+            </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/filtroDespegable.js' %}"></script>
+{% endblock %}

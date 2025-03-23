@@ -1,0 +1,62 @@
+{% extends 'real_estate/base.html' %}
+{% load static %}
+
+{% block title %}Nosotros - Inmobiliaria{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/nosotros.css' %}">
+<link rel="stylesheet" href="{% static 'css/informacion.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="about">
+    <h1>Conócenos</h1>
+    
+    <div class="history-section">
+        <h2>Nuestra Historia</h2>
+        <p>Somos una empresa inmobiliaria de reciente creación, fundada en 2023 con la visión de revolucionar el mercado inmobiliario mediante el uso de tecnología innovadora y un enfoque centrado en el cliente. Aunque somos nuevos en el sector, nuestro equipo cuenta con amplia experiencia en tecnología, diseño y atención al cliente.</p>
+        <p>Nacimos de la idea de crear una plataforma inmobiliaria que simplifique el proceso de compra, venta y renta de propiedades, eliminando las complicaciones tradicionales y ofreciendo una experiencia transparente y eficiente para todos nuestros usuarios.</p>
+    </div>
+    
+    <!-- More content -->
+    
+    <div class="team-section">
+        <div class="team-member">
+            <img src="{% static 'imgs/dev.png' %}" alt="Desarrollador Frontend">
+            <h3>Josué</h3>
+            <p>Desarrollador Frontend</p>
+            <p>Especialista en interfaces de usuario y experiencia de usuario</p>
+        </div>
+        <div class="team-member">
+            <img src="{% static 'imgs/dev.png' %}" alt="Desarrollador Backend">
+            <h3>Julio</h3>
+            <p>Desarrollador Backend</p>
+            <p>Experto en bases de datos y arquitectura de sistemas</p>
+        </div>
+        <div class="team-member">
+            <img src="{% static 'imgs/dev.png' %}" alt="Desarrollador Full Stack">
+            <h3>Juan</h3>
+            <p>Desarrollador Full Stack</p>
+            <p>Especialista en integración y optimización de sistemas</p>
+        </div>
+    </div>
+    
+    <h2>Nuestras Certificaciones</h2>
+    <div class="certifications">
+        <div class="certification">
+            <img src="{% static 'imgs/Asociación Nacional de Agentes Inmobiliarios.png' %}" alt="Certificación">
+            <p>Asociación Nacional de Agentes Inmobiliarios</p>
+        </div>
+        <div class="certification">
+            <img src="{% static 'imgs/Cámara de Comercio Local.png' %}" alt="Certificación">
+            <p>Cámara de Comercio Local</p>
+        </div>
+        <div class="certification">
+            <img src="{% static 'imgs/iso.webp' %}" alt="Certificación">
+            <p>ISO 9001:2015</p>
+        </div>
+    </div>
+    
+    <p class="cta-text">¿Listo para encontrar tu próxima propiedad o vender tu inmueble? <a href="{% url 'contacto' %}" class="cta-link">Contáctanos hoy mismo</a> y descubre la diferencia de trabajar con profesionales.</p>
+</section>
+{% endblock %}

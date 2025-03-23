@@ -1,0 +1,111 @@
+{% extends 'real_estate/base.html' %}
+{% load static %}
+
+{% block title %}Mis Propiedades - Inmobiliaria{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+<style>
+    .add-property-btn {
+        display: inline-block;
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+    .property-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .property-actions a {
+        padding: 8px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: white;
+        font-size: 14px;
+    }
+    .view-property-btn {
+        background-color: #3498db;
+    }
+    .edit-property-btn {
+        background-color: #2ecc71;
+    }
+    .delete-property-btn {
+        background-color: #e74c3c;
+    }
+    .no-properties {
+        text-align: center;
+        padding: 40px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+    .page-header {
+        background-color: #f8f9fa;
+        padding: 30px 0;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .page-header h1 {
+        margin-bottom: 10px;
+        color: #2c3e50;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Mis Propiedades</h1>
+    <p>Bienvenido, {{ request.user.username }}</p>
+</div>
+
+<div class="catalog-container">
+    <div class="add-property-container">
+        <a href="{% url 'add_property' %}" class="add-property-btn">
+            Agregar Nueva Propiedad
+        </a>
+    </div>
+    
+    <main class="properties-grid">
+        {% if properties %}
+            {% for property in properties %}
+                <div class="property-item">
+                    <div class="property-image">
+                        {% if property.main_image %}
+                            <img src="{{ property.main_image.image.url }}" alt="{{ property.title }}">
+                        {% else %}
+                            <img src="{% static 'imgs/CHANTE1.jpg' %}" alt="{{ property.title }}">
+                        {% endif %}
+                        <span class="property-tag">{{ property.get_listing_type_display }}</span>
+                    </div>
+                    <div class="property-info">
+                        <h3>{{ property.title }}</h3>
+                        <p class="property-price">${{ property.price }} MXN
+                            {% if property.listing_type == 'renta' %}/mes{% endif %}
+                        </p>
+                        <p class="property-location">{{ property.city }}, {{ property.state }}</p>
+                        <div class="property-features">
+                            <span>{{ property.bedrooms }} Habitaciones</span>
+                            <span>{{ property.bathrooms }} Baños</span>
+                            <span>{{ property.area }} m²</span>
+                        </div>
+                        <div class="property-actions">
+                            <a href="{% url 'detalle_propiedad' property.id %}" class="view-property-btn">Ver</a>
+                            <a href="{% url 'edit_property' property.id %}" class="edit-property-btn">Editar</a>
+                            <a href="{% url 'delete_property' property.id %}" class="delete-property-btn">Eliminar</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-properties">
+                <p>No tienes propiedades registradas. ¡Agrega una nueva propiedad!</p>
+            </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+.add-property-btn {
+    display: inline-block;
+    background-color: #3498db;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+}
+
+.add-property-btn:hover {
+    background-color: #2980b9;
+}
+
+.add-property-container {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+/* Ensure radio buttons for main image are visible and clickable */
+.checkbox-group input[type="radio"] {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    cursor: pointer;
+}
+
+/* Highlight selected main image */
+.checkbox-group input[type="radio"]:checked + label {
+    font-weight: bold;
+    color: #3498db;
+}

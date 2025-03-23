@@ -1,0 +1,78 @@
+{% extends 'real_estate/base.html' %}
+{% load static %}
+
+{% block title %}Inmobiliaria - Inicio{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+{% endblock %}
+
+{% block content %}
+<header class="hero">
+    <div class="hero-text">
+        <h1>Encuentra tu hogar ideal</h1>
+        <p>Explora nuestra selección de propiedades en venta y renta.</p>
+    </div>
+    <div class="search-bar">
+        <input type="text" placeholder="Buscar propiedades...">
+        <button>Buscar</button>
+    </div>
+</header>
+
+<section class="featured-properties">
+    <h2>Inmuebles Destacados</h2>
+    <div class="properties-carousel">
+        {% for property in featured_properties %}
+            <div class="property-card">
+                {% if property.main_image %}
+                    <img src="{{ property.main_image.image.url }}" alt="{{ property.title }}">
+                {% else %}
+                    <img src="{% static 'imgs/CHANTE1.jpg' %}" alt="{{ property.title }}">
+                {% endif %}
+                <h3>{{ property.title }}</h3>
+                <p>{{ property.description|truncatechars:100 }}</p>
+                
+                <a href="{% url 'detalle_propiedad' property.id %}" class="view-details-btn">Ver Detalles</a>
+            </div>
+        {% empty %}
+            <div class="property-card">
+                <!-- Empty state content -->
+            </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-button prev">&#10094;</button>
+    <button class="carousel-button next">&#10095;</button>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/trenDeCartas.js' %}"></script>
+{% endblock %}
+
+<nav class="navbar">
+        <div class="logo">Inmobiliaria</div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links">
+            <li class="mobile-profile">
+                <a href="{% url 'login' %}">
+                    <img src="{% static 'imgs/usuario.webp' %}" alt="Perfil del usuario">
+                </a>
+            </li>
+            <li><a href="{% url 'index' %}">Inicio</a></li>
+            <li><a href="{% url 'ventas' %}">Ventas</a></li>
+            <li><a href="{% url 'renta' %}">Renta</a></li>
+            <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+            <li><a href="{% url 'contacto' %}">Contacto</a></li>
+        </ul>
+        <div class="user-profile desktop-only">
+            <a href="{% url 'login' %}">
+                <img src="{% static 'imgs/usuario.webp' %}" alt="Perfil del usuario">
+            </a>
+        </div>
+    </nav>
