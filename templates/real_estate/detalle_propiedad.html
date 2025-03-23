@@ -1,0 +1,199 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ property.title }} - Inmobiliaria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/detallePropiedad.css' %}">
+    <!-- Google Maps API script removed -->
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Inmobiliaria</div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links">
+            <li class="mobile-profile">
+                <a href="{% url 'login' %}">
+                    <img src="{% static 'imgs/usuario.webp' %}" alt="Perfil del usuario">
+                </a>
+            </li>
+            <li><a href="{% url 'index' %}">Inicio</a></li>
+            <li><a href="{% url 'ventas' %}">Ventas</a></li>
+            <li><a href="{% url 'renta' %}">Renta</a></li>
+            <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+            <li><a href="{% url 'contacto' %}">Contacto</a></li>
+        </ul>
+        <div class="user-profile desktop-only">
+            <a href="{% url 'login' %}">
+                <img src="{% static 'imgs/usuario.webp' %}" alt="Perfil del usuario">
+            </a>
+        </div>
+    </nav>
+    
+    <div class="property-container">
+        <div class="breadcrumb">
+            
+        </div>
+        <!-- Imagen principal en el cuadro negro -->
+        <div class="property-gallery">
+            <div class="main-image">
+                {% if main_image %}
+                    <img src="{{ main_image.image.url }}" alt="{{ property.title }}">
+                {% else %}
+                    <img src="{% static 'imgs/CHANTE1.jpg' %}" alt="{{ property.title }}">
+                {% endif %}
+            </div>
+            <div class="thumbnail-container">
+                {% for image in property_images %}
+                    <div class="thumbnail {% if image == main_image %}active{% endif %}">
+                        <img src="{{ image.image.url }}" alt="{{ property.title }} - Imagen {{ forloop.counter }}">
+                    </div>
+                {% empty %}
+                    <div class="thumbnail active">
+                        <img src="{% static 'imgs/CHANTE1.jpg' %}" alt="{{ property.title }}">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Encabezado de la propiedad -->
+        <div class="property-header">
+            <h1>{{ property.title }}</h1>
+            <div class="property-price">
+                ${{ property.price }} MXN
+                {% if property.listing_type == 'renta' %}
+                    /mes
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Detalles de la propiedad en el cuadro inferior -->
+        <div class="property-details">
+            <div class="details-header">
+                <h2>Detalles de la Propiedad</h2>
+                <div class="property-id">ID: PROP-{{ property.id }}</div>
+            </div>
+            
+            <div class="details-grid">
+                <div class="details-section">
+                    <h3>Características Principales</h3>
+                    <ul class="features-list">
+                        <li><span class="feature-icon area-icon"></span>Superficie: {{ property.area }} m²</li>
+                        <li><span class="feature-icon bedroom-icon"></span>Recámaras: {{ property.bedrooms }}</li>
+                        <li><span class="feature-icon bathroom-icon"></span>Baños: {{ property.bathrooms }}</li>
+                        {% if property.parking_spaces > 0 %}
+                            <li><span class="feature-icon parking-icon"></span>Estacionamiento: {{ property.parking_spaces }} autos</li>
+                        {% endif %}
+                        <li><span class="feature-icon"></span>Tipo: {{ property.get_property_type_display }}</li>
+                    </ul>
+                </div>
+                
+                <div class="details-section">
+                    <h3>Amenidades</h3>
+                    <ul class="amenities-list">
+                        {% if property.is_furnished %}
+                            <li><span class="amenity-icon check-icon"></span>Amueblado</li>
+                        {% endif %}
+                        {% if property.accepts_pets %}
+                            <li><span class="amenity-icon check-icon"></span>Acepta mascotas</li>
+                        {% endif %}
+                        {% if property.has_security %}
+                            <li><span class="amenity-icon check-icon"></span>Seguridad 24h</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <div class="details-section full-width">
+                    <h3>Descripción</h3>
+                    <div class="property-description">
+                        <p>{{ property.description }}</p>
+                    </div>
+                </div>
+                
+                <div class="details-section">
+                    <h3>Ubicación</h3>
+                    <p>{{ property.address }}</p>
+                    <p>{{ property.city }}, {{ property.state }}</p>
+                    <div class="location-map">
+                        {% if property.latitude and property.longitude %}
+                            <iframe src="https://maps.google.com/maps?q={{ property.latitude }},{{ property.longitude }}&t=m&z=15&output=embed&iwloc=near" width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        {% else %}
+                            <img src="{% static 'imgs/mapa.jpg' %}" alt="Mapa de ubicación" width="100%" height="200">
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="details-section">
+                    <h3>Contacto del Asesor</h3>
+                    <div class="agent-info">
+                        <img src="{% static 'imgs/usuario.webp' %}" alt="Asesor Inmobiliario" class="agent-photo">
+                        <div class="agent-details">
+                            <h4>El borjas</h4>
+                            <p>Especialista en Propiedades de Lujo</p>
+                            <p><i class="contact-icon phone-icon"></i> (445) 123-4567</p>
+                            <p><i class="contact-icon email-icon"></i> ElBorjas@inmobiliaria.com</p>
+                            <button class="contact-button">Contactar ahora</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-button share-property" style="margin: 0 auto; width: 30%; display: block;">Compartir propiedad</button>
+            </div>
+            
+            <div class="similar-properties">
+                <h3>Propiedades similares</h3>
+                <div class="similar-grid">
+                    {% for similar in similar_properties %}
+                    <div class="similar-property">
+                        {% if similar.main_image %}
+                            <img src="{{ similar.main_image.image.url }}" alt="{{ similar.title }}">
+                        {% else %}
+                            <img src="{% static 'imgs/CHANTE2.jpg' %}" alt="{{ similar.title }}">
+                        {% endif %}
+                        <h4>{{ similar.title }}</h4>
+                        <p>${{ similar.price }} MXN{% if similar.listing_type == 'renta' %} /mes{% endif %}</p>
+                        <a href="{% url 'detalle_propiedad' similar.id %}" class="view-details">Ver detalles</a>
+                    </div>
+                    {% empty %}
+                    <div class="similar-property">
+                        <img src="{% static 'imgs/CHANTE2.jpg' %}" alt="Casa similar 1">
+                        <h4>Residencia en Centro Uriangato</h4>
+                        <p>$2,950,000 MXN</p>
+                        <a href="#" class="view-details">Ver detalles</a>
+                    </div>
+                    <div class="similar-property">
+                        <img src="{% static 'imgs/CHANTE3.jpg' %}" alt="Casa similar 2">
+                        <h4>Casa en Moroleón</h4>
+                        <p>$3,100,000 MXN</p>
+                        <a href="#" class="view-details">Ver detalles</a>
+                    </div>
+                    <div class="similar-property">
+                        <img src="{% static 'imgs/CHANTE5.jpg' %}" alt="Casa similar 3">
+                        <h4>Residencia en Yuriria</h4>
+                        <p>$2,650,000 MXN</p>
+                        <a href="#" class="view-details">Ver detalles</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>&copy; 2025 Inmobiliaria. Todos los derechos reservados.</p>
+    </footer>
+    
+    <script src="{% static 'js/hamburger.js' %}"></script>
+    <script src="{% static 'js/gallery.js' %}"></script>
+    
+    <!-- Remove the map initialization script at the end of the body -->
+</body>
+</html>
