@@ -6,6 +6,8 @@
     <title>Inmobiliaria</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Change this path to match your folder structure -->
+    <link rel="stylesheet" href="static/css/index.css">
 </head>
 <body>
     <nav class="navbar">
@@ -36,11 +38,15 @@
             <p>Explora nuestra selección de propiedades en venta y renta.</p>
         </div>
         <div class="search-bar">
-            <input type="text" placeholder="Buscar propiedades...">
-            <button>Buscar</button>
+            <form id="search-form" action="views/Ventas.html" method="get">
+                <input type="text" name="search" id="search-input" placeholder="Buscar propiedades...">
+                <!-- Replace button with a styled link -->
+                <button type="submit" id="search-button">Buscar</button>
+            </form>
         </div>
     </header>
 
+    <!-- Ensure no JavaScript is preventing form submission -->
     <section class="featured-properties">
         <h2>Inmuebles Destacados</h2>
         <div class="properties-carousel">
@@ -76,5 +82,10 @@
     
     <script src="js/trenDeCartas.js"></script>
     <script src="js/hamburger.js"></script>
+    
+    <script>
+        // Ensure no JavaScript is preventing form submission
+        console.log('Página cargada');
+    </script>
 </body>
 </html>

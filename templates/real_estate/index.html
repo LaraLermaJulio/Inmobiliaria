@@ -15,8 +15,10 @@
         <p>Explora nuestra selección de propiedades en venta y renta.</p>
     </div>
     <div class="search-bar">
-        <input type="text" placeholder="Buscar propiedades...">
-        <button>Buscar</button>
+        <form id="search-form" method="get">
+            <input type="text" name="search" id="search-input" placeholder="Buscar propiedades...">
+            <button type="submit" class="search-button">Buscar</button>
+        </form>
     </div>
 </header>
 
@@ -49,6 +51,36 @@
 {% block scripts %}
 {{ block.super }}
 <script src="{% static 'js/trenDeCartas.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const searchTerm = searchInput.value.trim();
+            
+            if (!searchTerm) {
+                alert('Por favor ingresa un término de búsqueda');
+                return;
+            }
+            
+            // Check if search term contains rental-related keywords
+            const rentalKeywords = ['renta', 'alquiler', 'arrendar', 'temporal', 'mensual'];
+            const isRental = rentalKeywords.some(keyword => 
+                searchTerm.toLowerCase().includes(keyword)
+            );
+            
+            // Redirect to appropriate page with search parameter
+            if (isRental) {
+                window.location.href = "{% url 'renta' %}?search=" + encodeURIComponent(searchTerm);
+            } else {
+                window.location.href = "{% url 'ventas' %}?search=" + encodeURIComponent(searchTerm);
+            }
+        });
+    });
+</script>
 {% endblock %}
 
 <nav class="navbar">

@@ -220,6 +220,94 @@
             </div>
         </main>
     </div>
+    <!-- Agregar este script justo antes de cerrar el body (</body>) -->
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener el parámetro de búsqueda de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('search');
+            
+            if (searchQuery) {
+                console.log('Término de búsqueda:', searchQuery); // Para depuración
+                
+                // Convertir a minúsculas para comparación sin distinción entre mayúsculas y minúsculas
+                const searchLower = searchQuery.toLowerCase();
+                
+                // Filtrar las propiedades visibles según el término de búsqueda
+                const propertyItems = document.querySelectorAll('.property-item');
+                let foundMatch = false;
+                
+                propertyItems.forEach(item => {
+                    const title = item.querySelector('h3').textContent.toLowerCase();
+                    const location = item.querySelector('.property-location').textContent.toLowerCase();
+                    const description = item.textContent.toLowerCase();
+                    
+                    if (title.includes(searchLower) || 
+                        location.includes(searchLower) || 
+                        description.includes(searchLower)) {
+                        item.style.display = 'block';
+                        foundMatch = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                // Mostrar un mensaje si no se encontraron coincidencias
+                if (!foundMatch) {
+                    const propertiesGrid = document.querySelector('.properties-grid');
+                    
+                    // Verificar si ya existe un mensaje de no resultados
+                    const existingMsg = document.querySelector('.no-results-message');
+                    if (!existingMsg) {
+                        const noResultsMsg = document.createElement('p');
+                        noResultsMsg.className = 'no-results-message';
+                        noResultsMsg.textContent = `No se encontraron propiedades que coincidan con "${searchQuery}"`;
+                        noResultsMsg.style.textAlign = 'center';
+                        noResultsMsg.style.padding = '20px';
+                        noResultsMsg.style.width = '100%';
+                        noResultsMsg.style.gridColumn = '1 / -1';
+                        noResultsMsg.style.fontSize = '18px';
+                        noResultsMsg.style.color = '#666';
+                        propertiesGrid.appendChild(noResultsMsg);
+                    }
+                }
+                
+                // Actualizar el título de la página para mostrar que es una búsqueda
+                const headerTitle = document.querySelector('.page-header h1');
+                if (pageHeader) {
+                    pageHeader.textContent = `Resultados de búsqueda: "${searchQuery}"`;
+                }
+                
+                // Ocultar los filtros si estamos en modo búsqueda
+                const filtersSidebar = document.querySelector('.filters-sidebar');
+                if (filtersSidebar) {
+                    filtersSidebar.style.display = 'none';
+                }
+                
+                // Agregar un botón para limpiar la búsqueda
+                const pageHeader = document.querySelector('.page-header');
+                if (pageHeader && !document.querySelector('.clear-search')) {
+                    const clearButton = document.createElement('button');
+                    clearButton.className = 'clear-search';
+                    clearButton.textContent = 'Limpiar búsqueda';
+                    clearButton.style.marginLeft = '10px';
+                    clearButton.style.padding = '5px 10px';
+                    clearButton.style.backgroundColor = '#f0f0f0';
+                    clearButton.style.border = '1px solid #ddd';
+                    clearButton.style.borderRadius = '4px';
+                    clearButton.style.cursor = 'pointer';
+                    
+                    clearButton.addEventListener('click', function() {
+                        window.location.href = 'Ventas.html';
+                    });
+                    
+                    pageHeader.appendChild(clearButton);
+                }
+            }
+        });
+    </script>
     <script src="../js/filtroDespegable.js"></script>
     <script src="../js/hamburger.js"></script>
 </body>

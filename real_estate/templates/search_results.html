@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="search-results-container">
+    <h1>Resultados de búsqueda para "{{ query }}"</h1>
+    
+    {% if properties %}
+        <div class="properties-grid">
+            {% for property in properties %}
+                <div class="property-item">
+                    <div class="property-image">
+                        {% if property.images.filter(is_main=True).first %}
+                            <img src="{{ property.images.filter(is_main=True).first.image.url }}" alt="{{ property.title }}">
+                        {% else %}
+                            <img src="/static/imgs/default-property.jpg" alt="{{ property.title }}">
+                        {% endif %}
+                        <span class="property-tag">{{ property.get_listing_type_display }}</span>
+                    </div>
+                    <div class="property-info">
+                        <h3>{{ property.title }}</h3>
+                        <p class="property-price">${{ property.price|floatformat:0 }}</p>
+                        <p class="property-location">{{ property.city }}, {{ property.state }}</p>
+                        <div class="property-features">
+                            <span>{{ property.bedrooms }} Habitaciones</span>
+                            <span>{{ property.bathrooms }} Baños</span>
+                            <span>{{ property.area }} m²</span>
+                            <span>{{ property.parking_spaces }} Estacionamientos</span>
+                        </div>
+                        <a href="{% url 'property_detail' property.id %}" class="view-details-btn">Ver Detalles</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-results">No se encontraron propiedades que coincidan con tu búsqueda.</p>
+    {% endif %}
+</div>
+{% endblock %}

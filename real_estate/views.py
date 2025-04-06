@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Property, PropertyImage
 from .forms import PropertyForm, PropertyImageForm
 from django.forms import modelformset_factory
+from django.http import JsonResponse
 
 def index(request):
     featured_properties = Property.objects.filter(is_featured=True)[:5]
@@ -25,6 +26,46 @@ def index(request):
     })
 
 def ventas(request):
+    search_query = request.GET.get('search', '')
+    properties = Property.objects.filter(listing_type='venta')
+    
+    if search_query:
+        properties = properties.filter(
+            Q(title__icontains=search_query) | 
+            Q(description__icontains=search_query) |
+            Q(address__icontains=search_query)
+        )
+    
+    # Add main image to each property
+    for prop in properties:
+        main_images = prop.images.filter(is_main=True)
+        if main_images.exists():
+            prop.main_image = main_images.first()
+        else:
+            prop.main_image = prop.images.first() if prop.images.exists() else None
+    
+    context = {
+        'properties': properties,
+        'search_query': search_query
+    }
+    return render(request, 'real_estate/ventas.html', context)
+
+def renta(request):
+    search_query = request.GET.get('search', '')
+    properties = Property.objects.filter(listing_type='renta')
+    
+    if search_query:
+        properties = properties.filter(
+            Q(title__icontains=search_query) | 
+            Q(description__icontains=search_query) |
+            Q(address__icontains=search_query)
+        )
+    
+    context = {
+        'properties': properties,
+        'search_query': search_query
+    }
+    return render(request, 'real_estate/renta.html', context)
     properties = Property.objects.filter(listing_type='venta')
     
     # Get unique cities for the location filter
@@ -410,3 +451,58 @@ def delete_image(request, image_id):
     
     # Redirect back to the property edit page
     return redirect('edit_property', id=property_id)
+
+
+def search_properties(request):
+    query = request.GET.get('q', '')
+    
+    if query:
+        # Buscar propiedades que coincidan con la consulta
+        properties = Property.objects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(address__icontains=query) |
+            Q(city__icontains=query) |
+            Q(state__icontains=query)
+        ).distinct()
+        
+        # Verificar si hay propiedades en venta que coincidan
+        ventas = properties.filter(listing_type='venta')
+        
+        # Verificar si hay propiedades en renta que coincidan
+        rentas = properties.filter(listing_type='renta')
+        
+        # Redireccionar según los resultados
+        if ventas.exists():
+            # Redireccionar a la página de ventas con un parámetro de filtro
+            return redirect(f'/views/Ventas.html?search={query}')
+        elif rentas.exists():
+            # Redireccionar a la página de rentas con un parámetro de filtro
+            return redirect(f'/views/Renta.html?search={query}')
+    
+    # Si no hay coincidencias o no hay consulta, mostrar la página de resultados vacía
+    context = {
+        'properties': Property.objects.none(),
+        'query': query,
+    }
+    
+    return render(request, 'search_results.html', context)
+
+
+# Agregar esta vista
+def api_search(request):
+    query = request.GET.get('q', '')
+    listing_type = request.GET.get('type', '')
+    
+    if query and listing_type:
+        properties = Property.objects.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(address__icontains=query) |
+            Q(city__icontains=query) |
+            Q(state__icontains=query)
+        ).filter(listing_type=listing_type)
+        
+        return JsonResponse({'found': properties.exists()})
+    
+    return JsonResponse({'found': False})

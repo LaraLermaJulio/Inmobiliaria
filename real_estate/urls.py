@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     # Existing URLs
@@ -17,5 +16,7 @@ urlpatterns = [
     path('editar-propiedad/<int:id>/', views.edit_property, name='edit_property'),
     path('eliminar-propiedad/<int:id>/', views.delete_property, name='delete_property'),
     path('delete-image/<int:image_id>/', views.delete_image, name='delete_image'),
-    path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
+    path('search/', views.search_properties, name='search_properties'),
+    # Agregar esta URL
+    path('api/search', views.api_search, name='api_search'),
 ]

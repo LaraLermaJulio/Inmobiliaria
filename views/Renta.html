@@ -231,6 +231,52 @@
         </main>
     </div>
     
+    <!-- Agregar este script al final del archivo, justo antes de </body> -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener el parámetro de búsqueda de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('search');
+            
+            if (searchQuery) {
+                // Filtrar las propiedades visibles según el término de búsqueda
+                const propertyItems = document.querySelectorAll('.property-item');
+                let foundMatch = false;
+                
+                propertyItems.forEach(item => {
+                    const title = item.querySelector('h3').textContent.toLowerCase();
+                    const location = item.querySelector('.property-location').textContent.toLowerCase();
+                    const description = item.textContent.toLowerCase();
+                    
+                    if (title.includes(searchQuery.toLowerCase()) || 
+                        location.includes(searchQuery.toLowerCase()) ||
+                        description.includes(searchQuery.toLowerCase())) {
+                        item.style.display = 'block';
+                        foundMatch = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                // Mostrar un mensaje si no se encontraron coincidencias
+                if (!foundMatch) {
+                    const propertiesGrid = document.querySelector('.properties-grid');
+                    const noResultsMsg = document.createElement('p');
+                    noResultsMsg.textContent = `No se encontraron propiedades que coincidan con "${searchQuery}"`;
+                    noResultsMsg.style.textAlign = 'center';
+                    noResultsMsg.style.padding = '20px';
+                    noResultsMsg.style.gridColumn = '1 / -1';
+                    propertiesGrid.appendChild(noResultsMsg);
+                }
+                
+                // Actualizar el título de la página para mostrar que es una búsqueda
+                const pageHeader = document.querySelector('.page-header h1');
+                if (pageHeader) {
+                    pageHeader.textContent = `Resultados de búsqueda: "${searchQuery}" - Renta`;
+                }
+            }
+        });
+    </script>
     <script src="../js/filtroDespegable.js"></script>
     <script src="../js/hamburger.js"></script>
 </body>
