@@ -112,6 +112,15 @@
             </div>
             <div class="form-col">
                 <div class="form-group">
+                    <label for="id_discount_percentage">Descuento (%)</label>
+                    {{ form.discount_percentage }}
+                    {% if form.discount_percentage.errors %}
+                        <div class="error-message">{{ form.discount_percentage.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-col">
+                <div class="form-group">
                     <label for="id_area">Área (m²)</label>
                     {{ form.area }}
                 </div>

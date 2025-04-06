@@ -235,7 +235,50 @@ body {
     background-color: #236b44;
 }
 
-/* Botones de acción */
+/* Estilos para la sección de compartir */
+.action-buttons {
+    text-align: center;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.share-title {
+    color: black;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.social-share-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    text-decoration: none;
+}
+
+.facebook-icon {
+    background-color: #3b5998;
+}
+
+.twitter-icon {
+    background-color: #1da1f2;
+}
+
+.instagram-icon {
+    background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+}
+
 .action-buttons {
     display: flex;
     gap: 15px;
@@ -476,4 +519,52 @@ body {
     .details-section {
         padding: 15px;
     }
+}
+
+/* Add these styles to your detallePropiedad.css file */
+
+.property-price-section {
+    margin: 15px 0;
+}
+
+.property-price-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.property-original-price {
+    text-decoration: line-through;
+    color: #e74c3c;
+    font-size: 18px;
+    margin: 0;
+}
+
+.property-discount-price {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c8a56;
+    margin: 0;
+}
+
+.property-discount-badge {
+    background-color: #2c8a56;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.property-price {
+    font-size: 28px;
+    font-weight: 700;
+    color: #4a362f;
+    margin: 0;
+    background-color: #f5f5f5;
+    padding: 8px 15px;
+    border-radius: 4px;
 }

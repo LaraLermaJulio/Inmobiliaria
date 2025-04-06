@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
     {% block extra_css %}{% endblock %}
+    <!-- Add these lines in the head section, before the closing </head> tag -->
+    <link rel="stylesheet" href="{% static 'css/discount_alerts.css' %}">
+    <script src="{% static 'js/discount_notifications.js' %}"></script>
 </head>
 <body {% block body_class %}{% endblock %}>
     {% block navbar %}

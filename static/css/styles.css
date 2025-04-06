@@ -213,6 +213,53 @@ body {
     }
 }
 
+/* Social sharing icons styles */
+.social-share-icons {
+    display: flex;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    text-decoration: none;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.social-icon:hover {
+    transform: scale(1.1);
+}
+
+.facebook-icon {
+    background-color: #3b5998;
+}
+
+.facebook-icon:hover {
+    background-color: #2d4373;
+}
+
+.twitter-icon {
+    background-color: #1da1f2;
+}
+
+.twitter-icon:hover {
+    background-color: #0c85d0;
+}
+
+.instagram-icon {
+    background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+}
+
+.instagram-icon:hover {
+    background: linear-gradient(45deg, #833ab4, #c13584, #e1306c, #fd1d1d, #405de6, #5851db);
+}
+
 /* Add these styles to your existing CSS */
 .mobile-profile {
     display: none;

@@ -1,22 +1,25 @@
+# Asumiendo que tienes un archivo forms.py con un PropertyForm
+# Si no existe, deberás crearlo con este contenido
+
 from django import forms
 from .models import Property, PropertyImage
 
 class PropertyForm(forms.ModelForm):
     class Meta:
         model = Property
-        fields = ['title', 'description', 'price', 'area', 'bedrooms', 'bathrooms', 
-                  'parking_spaces', 'property_type', 'listing_type', 'city', 'state', 
-                  'address', 'latitude', 'longitude', 'is_furnished', 'accepts_pets', 'has_security']
+        fields = [
+            'title', 'description', 'price', 'discount_percentage', 'address', 
+            'city', 'state', 'bedrooms', 'bathrooms', 'area', 
+            'parking_spaces', 'property_type', 'listing_type', 
+            'is_featured', 'accepts_pets', 'is_furnished', 'has_security',
+            'latitude', 'longitude'
+        ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
-            'latitude': forms.NumberInput(attrs={'step': 'any', 'placeholder': 'Ej. 19.4326'}),
-            'longitude': forms.NumberInput(attrs={'step': 'any', 'placeholder': 'Ej. -99.1332'}),
+            'discount_percentage': forms.NumberInput(attrs={'min': 0, 'max': 100, 'step': 0.01}),
         }
 
 class PropertyImageForm(forms.ModelForm):
-    image = forms.ImageField(label='Imagen', required=False)
-    delete = forms.BooleanField(required=False, initial=False, label='Eliminar')
-    
     class Meta:
         model = PropertyImage
         fields = ['image', 'is_main']

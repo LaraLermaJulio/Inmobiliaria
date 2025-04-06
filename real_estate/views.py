@@ -8,7 +8,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Property, PropertyImage
 from .forms import PropertyForm, PropertyImageForm
 from django.forms import modelformset_factory
+# Add these imports at the top of the file
 from django.http import JsonResponse
+from .models import Property
 
 def index(request):
     featured_properties = Property.objects.filter(is_featured=True)[:5]
@@ -66,88 +68,7 @@ def renta(request):
         'search_query': search_query
     }
     return render(request, 'real_estate/renta.html', context)
-    properties = Property.objects.filter(listing_type='venta')
-    
-    # Get unique cities for the location filter
-    cities = Property.objects.filter(listing_type='venta').values_list('city', flat=True).distinct()
-    
-    # Apply filters if they exist in the request
-    location = request.GET.get('location')
-    price_min = request.GET.get('price_min')
-    price_max = request.GET.get('price_max')
-    bedrooms = request.GET.getlist('bedrooms')
-    bathrooms = request.GET.getlist('bathrooms')
-    property_type = request.GET.get('property_type')
-    area_min = request.GET.get('area_min')
-    area_max = request.GET.get('area_max')
-    
-    # Apply location filter
-    if location:
-        properties = properties.filter(city=location)
-    
-    # Apply price filters
-    if price_min:
-        properties = properties.filter(price__gte=price_min)
-    if price_max:
-        properties = properties.filter(price__lte=price_max)
-    
-    # Apply bedroom filters (if any are selected)
-    if bedrooms:
-        # Handle the 4+ case specially
-        if '4' in bedrooms:
-            bedroom_filters = [int(b) for b in bedrooms if b != '4']
-            properties = properties.filter(
-                Q(bedrooms__in=bedroom_filters) | Q(bedrooms__gte=4)
-            )
-        else:
-            properties = properties.filter(bedrooms__in=[int(b) for b in bedrooms])
-    
-    # Apply bathroom filters (if any are selected)
-    if bathrooms:
-        # Handle the 3+ case specially
-        if '3' in bathrooms:
-            bathroom_filters = [int(b) for b in bathrooms if b != '3']
-            properties = properties.filter(
-                Q(bathrooms__in=bathroom_filters) | Q(bathrooms__gte=3)
-            )
-        else:
-            properties = properties.filter(bathrooms__in=[int(b) for b in bathrooms])
-    
-    # Apply property type filter
-    if property_type:
-        properties = properties.filter(property_type=property_type)
-    
-    # Apply area filters
-    if area_min:
-        properties = properties.filter(area__gte=area_min)
-    if area_max:
-        properties = properties.filter(area__lte=area_max)
-    
-    # Add main image to each property
-    for prop in properties:
-        main_images = prop.images.filter(is_main=True)
-        if main_images.exists():
-            prop.main_image = main_images.first()
-        else:
-            prop.main_image = None
-    
-    # Prepare filter values to pass back to template
-    filters = {
-        'location': location or '',
-        'price_min': price_min or '',
-        'price_max': price_max or '',
-        'bedrooms': bedrooms or [],
-        'bathrooms': bathrooms or [],
-        'property_type': property_type or '',
-        'area_min': area_min or '',
-        'area_max': area_max or '',
-    }
-    
-    return render(request, 'real_estate/ventas.html', {
-        'properties': properties,
-        'cities': cities,
-        'filters': filters
-    })
+
 
 def renta(request):
     properties = Property.objects.filter(listing_type='renta')
@@ -164,6 +85,8 @@ def renta(request):
     property_type = request.GET.get('property_type')
     area_min = request.GET.get('area_min')
     area_max = request.GET.get('area_max')
+    
+    
     
     # Apply location filter
     if location:
@@ -410,6 +333,10 @@ def edit_property(request, id):
                     print(f"Image with ID {main_image_id} not found")
             
             return redirect('my_properties')
+        else:
+            # Add this to debug form errors
+            print(f"Form errors: {form.errors}")
+            print(f"Formset errors: {formset.errors}")
     else:
         form = PropertyForm(instance=property)
         formset = ImageFormSet(queryset=property.images.all())
@@ -506,3 +433,48 @@ def api_search(request):
         return JsonResponse({'found': properties.exists()})
     
     return JsonResponse({'found': False})
+
+
+# Add the discounted_properties function at the module level
+def discounted_properties(request):
+    """API endpoint to get properties with discounts"""
+    properties = Property.objects.filter(discount_percentage__gt=0)
+    
+    properties_data = []
+    for prop in properties:
+        discounted_price = float(prop.price) - (float(prop.price) * float(prop.discount_percentage) / 100)
+        properties_data.append({
+            'id': prop.id,
+            'title': prop.title,
+            'price': float(prop.price),
+            'discount_percentage': float(prop.discount_percentage),
+            'discounted_price': round(discounted_price, 2)
+        })
+    
+    return JsonResponse({'properties': properties_data})
+
+
+@login_required
+def call_tracking_dashboard(request):
+    """View to display a list of properties with call statistics"""
+    # Get properties owned by the current user
+    properties = Property.objects.filter(owner=request.user)
+    
+    # Get call statistics for each property
+    property_stats = []
+    for property in properties:
+        # In a real implementation, you would have a PropertyCall model
+        # For now, we'll create dummy data
+        property_stats.append({
+            'property': property,
+            'total_calls': 0,
+            'completed_calls': 0,
+            'missed_calls': 0,
+            'last_call': None
+        })
+    
+    context = {
+        'property_stats': property_stats
+    }
+    
+    return render(request, 'real_estate/call_tracking_list.html', context)

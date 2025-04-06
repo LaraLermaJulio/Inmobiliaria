@@ -21,6 +21,7 @@ class Property(models.Model):
     title = models.CharField(max_length=200, verbose_name="Título")
     description = models.TextField(verbose_name="Descripción")
     price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Precio")
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name="Descuento (%)")
     address = models.CharField(max_length=255, verbose_name="Dirección")
     city = models.CharField(max_length=100, verbose_name="Ciudad")
     state = models.CharField(max_length=100, verbose_name="Estado")
@@ -44,6 +45,17 @@ class Property(models.Model):
     def __str__(self):
         return self.title
     
+    def get_discounted_price(self):
+        """Calcula el precio con descuento aplicado"""
+        if self.discount_percentage > 0:
+            discount_amount = (self.price * self.discount_percentage) / 100
+            return self.price - discount_amount
+        return self.price
+    
+    def has_discount(self):
+        """Verifica si la propiedad tiene un descuento aplicado"""
+        return self.discount_percentage > 0
+    
     class Meta:
         verbose_name = "Propiedad"
         verbose_name_plural = "Propiedades"
@@ -59,3 +71,32 @@ class PropertyImage(models.Model):
     class Meta:
         verbose_name = "Imagen de Propiedad"
         verbose_name_plural = "Imágenes de Propiedades"
+
+class PropertyCall(models.Model):
+    CALL_STATUS_CHOICES = [
+        ('completed', 'Completada'),
+        ('missed', 'Perdida'),
+        ('busy', 'Ocupado'),
+        ('failed', 'Fallida'),
+        ('in-progress', 'En Progreso'),
+    ]
+    
+    CALL_TYPE_CHOICES = [
+        ('inbound', 'Entrante'),
+        ('outbound', 'Saliente'),
+    ]
+    
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='calls')
+    caller_name = models.CharField(max_length=100, blank=True, null=True)
+    caller_number = models.CharField(max_length=20)
+    duration = models.IntegerField(default=0)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=CALL_STATUS_CHOICES, default='completed')
+    call_type = models.CharField(max_length=10, choices=CALL_TYPE_CHOICES, default='inbound')
+    notes = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+    
+    def __str__(self):
+        return f"Call from {self.caller_number} about {self.property.title}"

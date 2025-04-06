@@ -94,9 +94,18 @@
                         {% endif %}
                         <span class="property-tag">Renta</span>
                     </div>
+                    <!-- Reemplazar la sección del precio (similar a ventas.html) -->
                     <div class="property-info">
                         <h3>{{ property.title }}</h3>
-                        <p class="property-price">${{ property.price }} MXN/mes</p>
+                        {% if property.has_discount %}
+                            <div class="property-price-container">
+                                <p class="property-original-price">${{ property.price }} MXN/mes</p>
+                                <p class="property-discount-price">${{ property.get_discounted_price|floatformat:2 }} MXN/mes</p>
+                                <span class="property-discount-badge">-{{ property.discount_percentage|floatformat:0 }}%</span>
+                            </div>
+                        {% else %}
+                            <p class="property-price">${{ property.price }} MXN/mes</p>
+                        {% endif %}
                         <p class="property-location">{{ property.city }}, {{ property.state }}</p>
                         <div class="property-features">
                             <span>{{ property.bedrooms }} Habitaciones</span>

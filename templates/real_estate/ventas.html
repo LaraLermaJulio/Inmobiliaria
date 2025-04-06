@@ -95,9 +95,18 @@
                         {% endif %}
                         <span class="property-tag">Venta</span>
                     </div>
+                    <!-- Reemplazar la sección del precio (alrededor de la línea 100) -->
                     <div class="property-info">
                         <h3>{{ property.title }}</h3>
-                        <p class="property-price">${{ property.price }} MXN</p>
+                        {% if property.has_discount %}
+                            <div class="property-price-container">
+                                <p class="property-original-price">${{ property.price }} MXN</p>
+                                <p class="property-discount-price">${{ property.get_discounted_price|floatformat:2 }} MXN</p>
+                                <span class="property-discount-badge">-{{ property.discount_percentage|floatformat:0 }}%</span>
+                            </div>
+                        {% else %}
+                            <p class="property-price">${{ property.price }} MXN</p>
+                        {% endif %}
                         <p class="property-location">{{ property.city }}, {{ property.state }}</p>
                         <div class="property-features">
                             <span>{{ property.bedrooms }} Habitaciones</span>

@@ -1,0 +1,74 @@
+/* Styles for discount alerts */
+.discount-alert {
+    position: fixed;
+    right: 20px;
+    z-index: 1000;
+    max-width: 350px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.discount-alert:nth-child(1) {
+    bottom: 20px;
+}
+
+.discount-alert:nth-child(2) {
+    bottom: 220px;
+}
+
+.discount-alert.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.discount-alert-content {
+    padding: 20px;
+    position: relative;
+}
+
+.discount-alert-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+}
+
+.discount-alert-close:hover {
+    color: #333;
+}
+
+.discount-alert h3 {
+    margin-top: 0;
+    color: #2c8a56;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.discount-alert p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.discount-alert-button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 8px 15px;
+    background-color: #2c8a56;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.discount-alert-button:hover {
+    background-color: #236b44;
+}
