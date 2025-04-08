@@ -68,7 +68,7 @@
             <div class="property-id">ID: PROP-{{ property.id }}</div>
         </div>
         {% if property.listing_type == 'venta' %}
-        <div class="details-section full-width " >
+        <div class="details-section full-width calculator-section">
             <h3>Calculadora de Hipoteca</h3>
             <div class="calculator-grid">
                 <div class="calculator-input">
@@ -84,8 +84,8 @@
                     <input type="number" id="interest-rate" min="1" max="20" step="0.1" value="7.5">
                 </div>
             </div>
-            <button onclick="calculateMortgage({{ property.price }})" class="contact-button">Calcular Hipoteca</button>
-            <div id="mortgage-result" class="property-description"></div>
+            <button onclick="calculateMortgage({{ property.price }})" class="contact-button calculate-button">Calcular Hipoteca</button>
+            <div id="mortgage-result" class="mortgage-result"></div>
         </div>
         {% endif %}
         
