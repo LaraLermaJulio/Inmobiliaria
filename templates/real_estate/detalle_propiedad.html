@@ -147,8 +147,37 @@
                         <p>Especialista en Propiedades de Lujo</p>
                         <p><i class="contact-icon phone-icon"></i> (445) 123-4567</p>
                         <p><i class="contact-icon email-icon"></i> ElBorjas@inmobiliaria.com</p>
-                        <button class="contact-button">Contactar ahora</button>
+                        <button class="contact-button" id="showContactForm">Contactar ahora</button>
                     </div>
+                </div>
+                
+                <!-- Formulario de contacto (inicialmente oculto) -->
+                <div id="propertyContactForm" class="property-contact-form" style="display: none;">
+                    <h4>Contactar sobre esta propiedad</h4>
+                    <form id="contactPropertyForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="contact-name">Nombre completo:</label>
+                            <input type="text" id="contact-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Correo electrónico:</label>
+                            <input type="email" id="contact-email" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-phone">Teléfono:</label>
+                            <input type="tel" id="contact-phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-message">Mensaje:</label>
+                            <textarea id="contact-message" name="message" rows="4" required></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="cancelContactForm" class="cancel-button">Cancelar</button>
+                            <button type="submit" class="submit-button">Enviar mensaje</button>
+                        </div>
+                    </form>
+                    <div id="contactFormResponse" class="form-response"></div>
                 </div>
             </div>
         </div>
@@ -208,5 +237,9 @@
 
 <script src="{% static 'js/gallery.js' %}"></script>
 <script src="{% static 'js/calculator.js' %}"></script>
+<script src="{% static 'js/property_contact.js' %}"></script>
+{% endblock %}
 
+{% block extra_js %}
+<!-- You can keep this block if you need it for other JS files -->
 {% endblock %}

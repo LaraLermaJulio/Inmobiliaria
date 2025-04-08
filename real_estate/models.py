@@ -100,3 +100,18 @@ class PropertyCall(models.Model):
     
     def __str__(self):
         return f"Call from {self.caller_number} about {self.property.title}"
+
+
+class PropertyContact(models.Model):
+    property = models.ForeignKey('Property', on_delete=models.CASCADE, related_name='contacts')
+    name = models.CharField(max_length=100)
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"Contacto para {self.property.title} de {self.name}"

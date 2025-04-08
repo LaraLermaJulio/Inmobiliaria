@@ -12,6 +12,8 @@ from django.forms import modelformset_factory
 from django.http import JsonResponse
 from .models import Property
 from django.urls import reverse
+from .models import PropertyContact
+from django.views.decorators.http import require_POST
 
 def index(request):
     featured_properties = Property.objects.filter(is_featured=True)[:5]
@@ -596,3 +598,47 @@ def debug_search(request):
     }
     
     return JsonResponse(data)
+
+
+@require_POST
+def property_contact(request, property_id):
+    """Handle property contact form submissions"""
+    try:
+        property_obj = Property.objects.get(id=property_id)
+        
+        # Get form data
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        phone = request.POST.get('phone', '')
+        message = request.POST.get('message', '')
+        
+        # Create contact record
+        contact = PropertyContact.objects.create(
+            property=property_obj,
+            name=name,
+            email=email,
+            phone=phone,
+            message=message
+        )
+        
+        return JsonResponse({'success': True, 'message': 'Mensaje enviado correctamente'})
+    except Property.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Propiedad no encontrada'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+# Añadir una vista para mostrar los contactos de las propiedades del usuario
+@login_required
+def property_contacts(request):
+    """View to display contacts for properties owned by the current user"""
+    # Get properties owned by the current user
+    user_properties = Property.objects.filter(owner=request.user)
+    
+    # Get contacts for those properties
+    contacts = PropertyContact.objects.filter(property__in=user_properties)
+    
+    context = {
+        'contacts': contacts
+    }
+    
+    return render(request, 'real_estate/property_contacts.html', context)

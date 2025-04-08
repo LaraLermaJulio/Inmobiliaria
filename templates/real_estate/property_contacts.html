@@ -1,0 +1,126 @@
+{% extends 'real_estate/base.html' %}
+{% load static %}
+
+{% block title %}Mis Contactos - Inmobiliaria{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/my_properties.css' %}">
+<style>
+    .contacts-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+    
+    .contacts-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .contacts-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .contacts-table th,
+    .contacts-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .contacts-table th {
+        background-color: #f5f5f5;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .contacts-table tr:hover {
+        background-color: #f9f9f9;
+    }
+    
+    .contact-date {
+        white-space: nowrap;
+        color: #666;
+    }
+    
+    .contact-property {
+        font-weight: 500;
+        color: #2c8a56;
+    }
+    
+    .no-contacts {
+        text-align: center;
+        padding: 40px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .no-contacts p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #2c8a56;
+        text-decoration: none;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contacts-container">
+    <div class="contacts-header">
+        <h1>Contactos de mis propiedades</h1>
+        <a href="{% url 'my_properties' %}" class="back-link">Volver a Mis Propiedades</a>
+    </div>
+    
+    {% if contacts %}
+        <table class="contacts-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Propiedad</th>
+                    <th>Mensaje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in contacts %}
+                <tr>
+                    <td class="contact-date">{{ contact.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>{{ contact.name }}</td>
+                    <td>{{ contact.phone }}</td>
+                    <td>{{ contact.email|default:"-" }}</td>
+                    <td class="contact-property">
+                        <a href="{% url 'detalle_propiedad' contact.property.id %}">
+                            {{ contact.property.title }}
+                        </a>
+                    </td>
+                    <td>{{ contact.message|truncatechars:50 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="no-contacts">
+            <h2>No tienes contactos todavía</h2>
+            <p>Cuando los visitantes se interesen en tus propiedades y te contacten, aparecerán aquí.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

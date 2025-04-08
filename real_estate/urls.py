@@ -20,4 +20,6 @@ urlpatterns = [
     path('api/search', views.api_search, name='api_search'),
     # Add this to your urlpatterns list
     path('api/discounted-properties/', views.discounted_properties, name='discounted_properties'),
+    path('property/<int:property_id>/contact/', views.property_contact, name='property_contact'),
+    path('my-property-contacts/', views.property_contacts, name='property_contacts'),
 ]
