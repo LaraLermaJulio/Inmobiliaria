@@ -1,0 +1,33 @@
+{% extends 'real_estate/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Resultados de búsqueda para "{{ query }}"</h1>
+    
+    {% if properties|length == 0 %}
+        <div class="alert alert-info">
+            No se encontraron propiedades que coincidan con tu búsqueda.
+        </div>
+    {% else %}
+        <div class="row">
+            {% for property in properties %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if property.main_image %}
+                            <img src="{{ property.main_image.image.url }}" class="card-img-top" alt="{{ property.title }}">
+                        {% else %}
+                            <div class="no-image-placeholder">Sin imagen</div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ property.title }}</h5>
+                            <p class="card-text">{{ property.address }}, {{ property.city }}</p>
+                            <p class="card-text"><strong>${{ property.price }}{% if property.listing_type == 'renta' %}/mes{% endif %}</strong></p>
+                            <a href="{% url 'detalle_propiedad' property.id %}" class="btn btn-primary">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

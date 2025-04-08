@@ -17,7 +17,6 @@ urlpatterns = [
     path('eliminar-propiedad/<int:id>/', views.delete_property, name='delete_property'),
     path('delete-image/<int:image_id>/', views.delete_image, name='delete_image'),
     path('search/', views.search_properties, name='search_properties'),
-    # Agregar esta URL
     path('api/search', views.api_search, name='api_search'),
     # Add this to your urlpatterns list
     path('api/discounted-properties/', views.discounted_properties, name='discounted_properties'),

@@ -15,9 +15,10 @@
         <p>Explora nuestra selección de propiedades en venta y renta.</p>
     </div>
     <div class="search-bar">
-        <form id="search-form" method="get">
-            <input type="text" name="search" id="search-input" placeholder="Buscar propiedades...">
-            <button type="submit" class="search-button">Buscar</button>
+        <!-- Check your search form in index.html -->
+        <form id="search-form" action="{% url 'search_properties' %}" method="get">
+            <input type="text" id="search-input" name="q" placeholder="Buscar propiedades...">
+            <button type="submit">Buscar</button>
         </form>
     </div>
 </header>
@@ -56,29 +57,22 @@
         const searchForm = document.getElementById('search-form');
         const searchInput = document.getElementById('search-input');
         
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const searchTerm = searchInput.value.trim();
-            
-            if (!searchTerm) {
-                alert('Por favor ingresa un término de búsqueda');
-                return;
-            }
-            
-            // Check if search term contains rental-related keywords
-            const rentalKeywords = ['renta', 'alquiler', 'arrendar', 'temporal', 'mensual'];
-            const isRental = rentalKeywords.some(keyword => 
-                searchTerm.toLowerCase().includes(keyword)
-            );
-            
-            // Redirect to appropriate page with search parameter
-            if (isRental) {
-                window.location.href = "{% url 'renta' %}?search=" + encodeURIComponent(searchTerm);
-            } else {
-                window.location.href = "{% url 'ventas' %}?search=" + encodeURIComponent(searchTerm);
-            }
-        });
+        if (searchForm && searchInput) {
+            searchForm.addEventListener('submit', function(e) {
+                // Don't prevent default - let the form submit normally
+                // This will call our search_properties view which handles the redirection
+                
+                const searchTerm = searchInput.value.trim();
+                
+                if (!searchTerm) {
+                    e.preventDefault(); // Only prevent if empty
+                    alert('Por favor ingresa un término de búsqueda');
+                    return;
+                }
+                
+                // Let the form submit normally to search_properties
+            });
+        }
     });
 </script>
 {% endblock %}
