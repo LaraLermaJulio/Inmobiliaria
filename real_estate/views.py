@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Property, PropertyImage
-from django.db.models import Q
+from django.db.models import Q, Count, Sum  # Add Sum here
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -14,6 +14,12 @@ from .models import Property
 from django.urls import reverse
 from .models import PropertyContact
 from django.views.decorators.http import require_POST
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.core.serializers.json import DjangoJSONEncoder
+import json
 
 def index(request):
     featured_properties = Property.objects.filter(is_featured=True)[:5]
@@ -261,8 +267,12 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'real_estate/login.html', {'form': form})
 
-def detalle_propiedad(request, id):
-    property = get_object_or_404(Property, id=id)
+def property_detail(request, property_id):
+    property = get_object_or_404(Property, id=property_id)
+    
+    # Incrementar el contador de vistas
+    property.views += 1
+    property.save()
     
     # Get property images using the same pattern as in ventas/renta views
     property_images = property.images.all()
@@ -642,3 +652,38 @@ def property_contacts(request):
     }
     
     return render(request, 'real_estate/property_contacts.html', context)
+
+
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
+def estadisticas_vistas(request):
+    # Obtener datos para el gráfico mensual
+    year = datetime.now().year
+    monthly_views = Property.objects.annotate(
+        month=TruncMonth('created_at')
+    ).values('month').annotate(
+        total_views=Sum('views')  # Ahora Sum está definido
+    ).order_by('month')
+
+    # Convertir los datos a un formato que pueda ser serializado
+    monthly_data = [
+        {
+            'month': item['month'].strftime('%Y-%m-%d'),
+            'total_views': item['total_views'] or 0
+        }
+        for item in monthly_views
+    ]
+
+    # Obtener las propiedades más vistas
+    top_properties = Property.objects.order_by('-views')[:10]
+
+    context = {
+        'monthly_views': json.dumps(monthly_data, cls=DjangoJSONEncoder),
+        'top_properties': top_properties,
+    }
+    return render(request, 'real_estate/estadisticas.html', context)

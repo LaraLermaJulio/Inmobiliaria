@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 class Property(models.Model):
     # Add the owner field
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='properties', null=True, blank=True)
+    views = models.PositiveIntegerField(default=0, verbose_name="Vistas")
     
     PROPERTY_TYPE_CHOICES = [
         ('casa', 'Casa'),

@@ -14,6 +14,7 @@
         
     </div>
     <!-- Imagen principal en el cuadro negro -->
+    <!-- Galería de imágenes - cuadro negro superior -->
     <div class="property-gallery">
         <div class="main-image">
             {% if main_image %}
@@ -65,7 +66,12 @@
     <div class="property-details">
         <div class="details-header">
             <h2>Detalles de la Propiedad</h2>
-            <div class="property-id">ID: PROP-{{ property.id }}</div>
+            <div class="property-id">
+                ID: PROP-{{ property.id }}
+                <span class="views-count">
+                    <i class="fas fa-eye"></i> {{ property.views }} vistas
+                </span>
+            </div>
         </div>
         {% if property.listing_type == 'venta' %}
         <div class="details-section full-width calculator-section">
@@ -241,5 +247,46 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- You can keep this block if you need it for other JS files -->
+
+
+<script>
+    
+    // Función para calcular la hipoteca
+    function calculateMortgage(propertyPrice) {
+        const downPaymentPercent = parseFloat(document.getElementById('down-payment').value);
+        const loanTerm = parseInt(document.getElementById('loan-term').value);
+        const interestRate = parseFloat(document.getElementById('interest-rate').value);
+        
+        // Calcular el enganche en cantidad
+        const downPayment = (downPaymentPercent / 100) * propertyPrice;
+        
+        // Calcular el monto del préstamo
+        const loanAmount = propertyPrice - downPayment;
+        
+        // Calcular la tasa de interés mensual
+        const monthlyInterestRate = (interestRate / 100) / 12;
+        
+        // Calcular el número de pagos
+        const numberOfPayments = loanTerm * 12;
+        
+        // Calcular el pago mensual
+        const monthlyPayment = (loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) / 
+                              (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
+        
+        // Calcular el costo total
+        const totalCost = monthlyPayment * numberOfPayments;
+        
+        // Mostrar los resultados
+        const resultDiv = document.getElementById('mortgage-result');
+        resultDiv.innerHTML = `
+            <h4>Resumen del Préstamo</h4>
+            <p><strong>Pago Mensual:</strong> $${monthlyPayment.toFixed(2)} MXN</p>
+            <p><strong>Enganche:</strong> $${downPayment.toFixed(2)} MXN</p>
+            <p><strong>Monto del Préstamo:</strong> $${loanAmount.toFixed(2)} MXN</p>
+            <p><strong>Costo Total:</strong> $${totalCost.toFixed(2)} MXN</p>
+        `;
+        
+    }
+
+</script>
 {% endblock %}

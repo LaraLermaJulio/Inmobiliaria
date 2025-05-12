@@ -138,7 +138,34 @@ body {
     background-color: rgba(0, 0, 0, 0.2);
     padding: 5px 10px;
     border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
+
+.views-count {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding-left: 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Eliminar o comentar los estilos antiguos del contador de vistas */
+/* .views-counter {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgb(255, 255, 255);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+} */
 
 .details-grid {
     display: grid;
@@ -651,6 +678,8 @@ body {
     border-left: 4px solid #2c8a56;
 }
 
+
+
 /* Responsive design for calculator */
 @media (max-width: 768px) {
     .calculator-grid {
@@ -767,4 +796,45 @@ body {
     color: #cc0000;
     border-radius: 4px;
     border-left: 4px solid #cc0000;
+}
+
+/* Estilos para el contador de vistas */
+.property-gallery {
+    position: relative;
+    width: 100%;
+    background: transparent;  /* Cambiado de negro a transparente */
+    margin-bottom: 2rem;
+}
+
+.main-image {
+    position: relative;
+    width: 100%;
+    background: transparent;  /* Aseguramos que el contenedor de la imagen principal sea transparente */
+    overflow: hidden;
+}
+
+.main-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+.views-counter {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgb(255, 255, 255);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.views-counter i {
+    font-size: 16px;
 }

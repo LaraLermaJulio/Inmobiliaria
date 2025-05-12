@@ -8,8 +8,8 @@ urlpatterns = [
     path('renta/', views.renta, name='renta'),
     path('nosotros/', views.nosotros, name='nosotros'),
     path('contacto/', views.contacto, name='contacto'),
-    path('detalle-propiedad/<int:id>/', views.detalle_propiedad, name='detalle_propiedad'),
-    
+    path('detalle-propiedad/<int:property_id>/', views.property_detail, name='detalle_propiedad'),
+    path('estadisticas/', views.estadisticas_vistas, name='estadisticas_vistas'),
     # New URLs for property management
     path('mis-propiedades/', views.my_properties, name='my_properties'),
     path('agregar-propiedad/', views.add_property, name='add_property'),

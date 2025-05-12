@@ -1,0 +1,508 @@
+{% extends 'real_estate/base.html' %}
+{% load static %}
+
+{% block title %}Estadísticas de Vistas - Inmobiliaria{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/estadisticas.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<!-- Agregar la biblioteca html2pdf -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="stats-container">
+    <h1>Relación de vistas de propiedades</h1>
+    
+    <!-- Selector de visualización -->
+    <div class="view-selector">
+        <label for="viewType">Ver datos por:</label>
+        <select id="viewType" onchange="changeViewType()">
+            <option value="month">Mes</option>
+            <option value="year">Año</option>
+        </select>
+    </div>
+    
+    <!-- Agregar botones de vista previa e impresión -->
+    <div class="print-button-container">
+        <button id="previewButton" class="preview-button">
+            <i class="fas fa-eye"></i> Vista Previa
+        </button>
+        <button id="printButton" class="print-button">
+            <i class="fas fa-file-pdf"></i> Exportar como PDF
+        </button>
+    </div>
+    
+    <!-- Modal para vista previa -->
+    <div id="previewModal" class="preview-modal">
+        <div class="preview-modal-content">
+            <span class="close-preview">&times;</span>
+            <h2>Vista Previa</h2>
+            <div id="preview-content"></div>
+            <button id="confirmPrint" class="print-button">Confirmar e Imprimir</button>
+        </div>
+    </div>
+    
+    <div id="content-to-print">
+        <div class="chart-container">
+            <canvas id="viewsChart"></canvas>
+        </div>
+
+        <div class="table-container">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>PROPIEDAD</th>
+                        <th>VISTAS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for property in top_properties %}
+                    <tr>
+                        <td>{{ property.title }}</td>
+                        <td>{{ property.views }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer class="stats-footer">
+    <div class="social-links">
+        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+    </div>
+    <p>Todos los derechos reservados 2025</p>
+</footer>
+
+<script>
+const ctx = document.getElementById('viewsChart').getContext('2d');
+const monthlyData = JSON.parse('{{ monthly_views|safe }}');
+let chart;
+
+// Configuración de los meses en español
+const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+// Datos para diferentes vistas
+const monthlyLabels = monthlyData.map(item => {
+    const date = new Date(item.month);
+    return `${meses[date.getMonth()]}-${date.getFullYear()}`;
+});
+
+const monthlyValues = monthlyData.map(item => parseInt(item.total_views));
+
+// Función para agrupar datos por año
+function getYearlyData() {
+    const yearlyData = {};
+    
+    monthlyData.forEach(item => {
+        const date = new Date(item.month);
+        const year = date.getFullYear();
+        
+        if (!yearlyData[year]) {
+            yearlyData[year] = 0;
+        }
+        
+        yearlyData[year] += parseInt(item.total_views);
+    });
+    
+    return {
+        labels: Object.keys(yearlyData),
+        values: Object.values(yearlyData)
+    };
+}
+
+// Registrar el plugin de datalabels
+Chart.register(ChartDataLabels);
+
+// Función para crear o actualizar la gráfica
+function createChart(labels, data, title) {
+    if (chart) {
+        chart.destroy();
+    }
+    
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: title,
+                data: data,
+                backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                borderColor: 'rgb(255, 159, 64)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    ticks: {
+                        stepSize: 500,
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: true
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: function(value) {
+                        return value.toLocaleString();
+                    },
+                    color: '#333',
+                    font: {
+                        weight: 'bold'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Función para cambiar el tipo de visualización
+function changeViewType() {
+    const viewType = document.getElementById('viewType').value;
+    
+    if (viewType === 'month') {
+        createChart(monthlyLabels, monthlyValues, 'Vistas por mes');
+    } else if (viewType === 'year') {
+        const yearlyData = getYearlyData();
+        createChart(yearlyData.labels, yearlyData.values, 'Vistas por año');
+    }
+}
+
+// Inicializar la gráfica con vista mensual por defecto
+createChart(monthlyLabels, monthlyValues, 'Vistas por mes');
+
+// Función para generar el PDF
+document.getElementById('printButton').addEventListener('click', function() {
+    // Mensaje de carga
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
+    const button = this;
+    
+    // Obtener la imagen del gráfico
+    const canvas = document.getElementById('viewsChart');
+    const chartImage = canvas.toDataURL('image/png');
+    
+    // Obtener datos de la tabla
+    const allRows = document.querySelectorAll('.stats-table tbody tr');
+    const totalRows = allRows.length;
+    const tableData = Array.from(allRows).map(row => [
+        row.cells[0].textContent,
+        row.cells[1].textContent
+    ]);
+    
+    // Crear PDF con jsPDF
+    const doc = new jspdf.jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+    });
+    
+    // Añadir título
+    doc.setFontSize(16);
+    doc.text('Relación de vistas de propiedades', 105, 20, { align: 'center' });
+    
+    // Añadir gráfico
+    const imgWidth = 190;
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+    doc.addImage(chartImage, 'PNG', 10, 30, imgWidth, imgHeight);
+    
+    // Añadir tabla
+    doc.setFontSize(12);
+    doc.text('Listado de propiedades', 105, imgHeight + 40, { align: 'center' });
+    
+    // Configurar tabla
+    doc.setFontSize(10);
+    doc.autoTable({
+        startY: imgHeight + 50,
+        head: [['PROPIEDAD', 'VISTAS']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [248, 249, 250], textColor: [0, 0, 0] },
+        columnStyles: {
+            0: { cellWidth: 140 },
+            1: { cellWidth: 30, halign: 'center' }
+        },
+        margin: { left: 10, right: 10 }
+    });
+    
+    // Añadir pie de página mejorado
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        
+        // Línea divisoria para el footer
+        doc.setDrawColor(200, 200, 200);
+        doc.line(10, 280, 200, 280);
+        
+        // Texto del footer
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Total de propiedades: ${totalRows}`, 20, 287);
+        
+        // Iconos de redes sociales (simulados con texto)
+        doc.text('Twitter Instagram', 105, 287, { align: 'center' });
+        
+        // Derechos reservados
+        doc.text('Todos los derechos reservados 2025', 190, 287, { align: 'right' });
+        
+        // Número de página
+        doc.text(`Página ${i} de ${pageCount}`, 105, 292, { align: 'center' });
+    }
+    
+    // Guardar PDF
+    doc.save('estadisticas-propiedades.pdf');
+    
+    // Restaurar el texto del botón
+    button.innerHTML = '<i class="fas fa-file-pdf"></i>Exportar como PDF';
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+    // Código JavaScript existente
+    
+    // Agregar funcionalidad de vista previa
+    document.addEventListener('DOMContentLoaded', function() {
+        const previewButton = document.getElementById('previewButton');
+        const printButton = document.getElementById('printButton');
+        const previewModal = document.getElementById('previewModal');
+        const closePreview = document.querySelector('.close-preview');
+        const confirmPrint = document.getElementById('confirmPrint');
+        const previewContent = document.getElementById('preview-content');
+        const contentToPrint = document.getElementById('content-to-print');
+        
+        // Mostrar vista previa
+        previewButton.addEventListener('click', function() {
+            // Crear un contenedor para la vista previa
+            previewContent.innerHTML = `
+                <div class="preview-chart-container" style="height: 400px; margin-bottom: 20px;">
+                    <canvas id="previewChart"></canvas>
+                </div>
+                <div class="table-container">
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>PROPIEDAD</th>
+                                <th>VISTAS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Array.from(document.querySelectorAll('.stats-table tbody tr')).map(row => `
+                                <tr>
+                                    <td>${row.cells[0].textContent}</td>
+                                    <td>${row.cells[1].textContent}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            // Mostrar el modal
+            previewModal.style.display = 'block';
+            
+            // Crear una nueva gráfica en el modal
+            const previewCtx = document.getElementById('previewChart').getContext('2d');
+            const viewType = document.getElementById('viewType').value;
+            
+            let previewLabels, previewData, previewTitle;
+            
+            if (viewType === 'month') {
+                previewLabels = monthlyLabels;
+                previewData = monthlyValues;
+                previewTitle = 'Vistas por mes';
+            } else {
+                const yearlyData = getYearlyData();
+                previewLabels = yearlyData.labels;
+                previewData = yearlyData.values;
+                previewTitle = 'Vistas por año';
+            }
+            
+            // Crear la gráfica de vista previa
+            new Chart(previewCtx, {
+                type: 'bar',
+                data: {
+                    labels: previewLabels,
+                    datasets: [{
+                        label: previewTitle,
+                        data: previewData,
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                        borderColor: 'rgb(255, 159, 64)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                stepSize: 500,
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: function(value) {
+                                return value.toLocaleString();
+                            },
+                            color: '#333',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Cerrar vista previa
+        closePreview.addEventListener('click', function() {
+            previewModal.style.display = 'none';
+        });
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        window.addEventListener('click', function(event) {
+            if (event.target === previewModal) {
+                previewModal.style.display = 'none';
+            }
+        });
+        
+        // Confirmar e imprimir
+        confirmPrint.addEventListener('click', function() {
+            previewModal.style.display = 'none';
+            generatePDF();
+        });
+        
+        // Función para generar PDF directamente
+        printButton.addEventListener('click', function() {
+            generatePDF();
+        });
+        
+        // Función para generar el PDF
+        function generatePDF() {
+            const element = document.getElementById('content-to-print');
+            const opt = {
+                margin: 1,
+                filename: 'estadisticas_propiedades.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save();
+        }
+    });
+</script>
+
+<!-- Agregar estilos para el modal de vista previa -->
+<style>
+    .preview-button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        margin-right: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .preview-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.7);
+    }
+    
+    .preview-modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 900px;
+        max-height: 80vh;
+        overflow-y: auto;
+        border-radius: 8px;
+        position: relative;
+    }
+    
+    .close-preview {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .close-preview:hover,
+    .close-preview:focus {
+        color: black;
+        text-decoration: none;
+    }
+    
+    #preview-content {
+        margin: 20px 0;
+    }
+    
+    #confirmPrint {
+        display: block;
+        margin: 20px auto 0;
+    }
+</style>
+{% endblock %}
