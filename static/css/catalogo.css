@@ -384,18 +384,54 @@
     margin-bottom: 20px;
 }
 
+/* Estilos para los botones de acción en mis propiedades */
 .property-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
-.property-actions a {
+.view-details-btn, .edit-property-btn, .toggle-visibility-btn {
     padding: 8px 12px;
     border-radius: 4px;
-    text-decoration: none;
-    color: white;
     font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.view-details-btn {
+    background-color: #2c8a56;
+    color: white;
+    text-decoration: none;
+}
+
+.edit-property-btn {
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+}
+
+.toggle-visibility-btn {
+    background-color: #f39c12;
+    color: white;
+    border: none;
+}
+
+.toggle-visibility-btn[data-is-visible="false"] {
+    background-color: #7f8c8d;
+}
+
+.toggle-visibility-btn i {
+    margin-right: 5px;
+}
+
+.view-details-btn:hover, .edit-property-btn:hover, .toggle-visibility-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
 }
 
 .view-property-btn {

@@ -14,6 +14,7 @@ from .models import Property
 from django.urls import reverse
 from .models import PropertyContact
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
@@ -48,7 +49,7 @@ def index(request):
 
 def ventas(request):
     search_query = request.GET.get('search', '')
-    properties = Property.objects.filter(listing_type='venta')
+    properties = Property.objects.filter(listing_type='venta', is_visible=True)
     
     # Get unique cities for the location filter
     cities = Property.objects.filter(listing_type='venta').values_list('city', flat=True).distinct()
@@ -143,7 +144,7 @@ def ventas(request):
 
 def renta(request):
     search_query = request.GET.get('search', '')
-    properties = Property.objects.filter(listing_type='renta')
+    properties = Property.objects.filter(listing_type='renta', is_visible=True)
     
     # Get unique cities for the location filter
     cities = Property.objects.filter(listing_type='renta').values_list('city', flat=True).distinct()
@@ -492,7 +493,8 @@ def search_properties(request):
         Q(address__icontains=query) |
         Q(city__icontains=query) |
         Q(state__icontains=query),
-        listing_type='venta'
+        listing_type='venta',
+        is_visible=True  # Solo mostrar propiedades visibles
     )
     
     # Buscar propiedades en rentas
@@ -502,7 +504,8 @@ def search_properties(request):
         Q(address__icontains=query) |
         Q(city__icontains=query) |
         Q(state__icontains=query),
-        listing_type='renta'
+        listing_type='renta',
+        is_visible=True  # Solo mostrar propiedades visibles
     )
     
     # Redirigir a la página correspondiente según los resultados
@@ -519,21 +522,6 @@ def search_properties(request):
             'query': query,
             'no_results': True
         })
-    
-    # Add main image to each property
-    for prop in properties:
-        main_images = prop.images.filter(is_main=True)
-        if main_images.exists():
-            prop.main_image = main_images.first()
-        else:
-            prop.main_image = prop.images.first() if prop.images.exists() else None
-    
-    context = {
-        'properties': properties,
-        'query': query,
-    }
-    
-    return render(request, 'real_estate/search_results.html', context)
 
 
 # Agregar esta vista
@@ -1259,3 +1247,33 @@ def reset_views(request):
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
+
+@login_required
+def toggle_property_visibility(request):
+    if request.method == 'POST':
+        property_id = request.POST.get('property_id')
+        if property_id:
+            try:
+                property = Property.objects.get(id=property_id, owner=request.user)
+                property.is_visible = not property.is_visible
+                property.save()
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True, 
+                        'is_visible': property.is_visible,
+                        'message': f'La propiedad ahora está {"visible" if property.is_visible else "oculta"}'
+                    })
+                else:
+                    # Redirección normal para solicitudes no-AJAX
+                    return redirect('my_properties')
+            except Exception as e:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'message': str(e)})
+                else:
+                    # Redirección normal para solicitudes no-AJAX
+                    return redirect('my_properties')
+    
+    # Redirección por defecto
+    return redirect('my_properties')

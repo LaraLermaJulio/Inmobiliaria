@@ -5,6 +5,115 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+<style>
+    .property-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    .property-actions .btn {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .property-actions .btn i {
+        margin-right: 5px;
+    }
+
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-warning {
+        background-color: #f39c12;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #7f8c8d;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Obtener todos los botones de visibilidad
+        const toggleButtons = document.querySelectorAll('.toggle-visibility-btn');
+
+        // Agregar evento de clic a cada botón
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const propertyId = this.getAttribute('data-property-id');
+                // Obtener el token CSRF directamente del template
+                const csrfToken = '{{ csrf_token }}';
+
+                // Crear FormData para enviar la solicitud
+                const formData = new FormData();
+                formData.append('property_id', propertyId);
+                formData.append('csrfmiddlewaretoken', csrfToken);
+
+                // Enviar solicitud AJAX
+                fetch('{% url "toggle_property_visibility" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Actualizar el botón según el nuevo estado
+                            if (data.is_visible) {
+                                this.innerHTML = '<i class="fas fa-eye-slash"></i> Ocultar';
+                                this.classList.remove('btn-secondary');
+                                this.classList.add('btn-warning');
+                            } else {
+                                this.innerHTML = '<i class="fas fa-eye"></i> Mostrar';
+                                this.classList.remove('btn-warning');
+                                this.classList.add('btn-secondary');
+                            }
+                            console.log('Visibilidad cambiada con éxito:', data.message);
+                        } else {
+                            console.error('Error al cambiar visibilidad:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error en la solicitud:', error);
+                    });
+            });
+        });
+    });
+</script>
 {% endblock %}
 
 {% block content %}
@@ -22,56 +131,80 @@
             Ver Contactos
         </a>
     </div>
-    
+
     <main class="properties-grid">
         {% if properties %}
-            {% for property in properties %}
-                <div class="property-item">
-                    <div class="property-image">
-                        {% if property.main_image %}
-                            <img src="{{ property.main_image.image.url }}" alt="{{ property.title }}">
-                        {% else %}
-                            <img src="{% static 'imgs/CHANTE1.jpg' %}" alt="{{ property.title }}">
-                        {% endif %}
-                        <span class="property-tag">{{ property.get_listing_type_display }}</span>
-                    </div>
-                    <!-- Reemplazar la sección del precio (alrededor de la línea 87) -->
-                    <div class="property-info">
-                        <h3>{{ property.title }}</h3>
-                        {% if property.has_discount %}
-                            <div class="property-price-container">
-                                <p class="property-original-price">${{ property.price }} MXN
-                                    {% if property.listing_type == 'renta' %}/mes{% endif %}
-                                </p>
-                                <p class="property-discount-price">${{ property.get_discounted_price|floatformat:2 }} MXN
-                                    {% if property.listing_type == 'renta' %}/mes{% endif %}
-                                </p>
-                                <span class="property-discount-badge">-{{ property.discount_percentage|floatformat:0 }}%</span>
-                            </div>
-                        {% else %}
-                            <p class="property-price">${{ property.price }} MXN
-                                {% if property.listing_type == 'renta' %}/mes{% endif %}
-                            </p>
-                        {% endif %}
-                        <p class="property-location">{{ property.city }}, {{ property.state }}</p>
-                        <div class="property-features">
-                            <span>{{ property.bedrooms }} Habitaciones</span>
-                            <span>{{ property.bathrooms }} Baños</span>
-                            <span>{{ property.area }} m²</span>
-                        </div>
-                        <div class="property-actions">
-                            <a href="{% url 'detalle_propiedad' property.id %}" class="view-property-btn">Ver</a>
-                            <a href="{% url 'edit_property' property.id %}" class="edit-property-btn">Editar</a>
-                            <a href="{% url 'delete_property' property.id %}" class="delete-property-btn">Eliminar</a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <div class="no-properties">
-                <p>No tienes propiedades registradas. ¡Agrega una nueva propiedad!</p>
+        {% for property in properties %}
+        <div class="property-item">
+            <div class="property-image">
+                {% if property.main_image %}
+                <img src="{{ property.main_image.image.url }}" alt="{{ property.title }}">
+                {% else %}
+                <img src="{% static 'imgs/CHANTE1.jpg' %}" alt="{{ property.title }}">
+                {% endif %}
+                <span class="property-tag">{{ property.get_listing_type_display }}</span>
             </div>
+            <div class="property-info">
+                <h3>{{ property.title }}</h3>
+                {% if property.has_discount %}
+                <div class="property-price-container">
+                    <p class="property-original-price">${{ property.price }} MXN
+                        {% if property.listing_type == 'renta' %}/mes{% endif %}
+                    </p>
+                    <p class="property-discount-price">${{ property.get_discounted_price|floatformat:2 }} MXN
+                        {% if property.listing_type == 'renta' %}/mes{% endif %}
+                    </p>
+                    <span class="property-discount-badge">-{{ property.discount_percentage|floatformat:0 }}%</span>
+                </div>
+                {% else %}
+                <p class="property-price">${{ property.price }} MXN
+                    {% if property.listing_type == 'renta' %}/mes{% endif %}
+                </p>
+                {% endif %}
+                <p class="property-location">{{ property.city }}, {{ property.state }}</p>
+                <div class="property-features">
+                    <span>{{ property.bedrooms }} Habitaciones</span>
+                    <span>{{ property.bathrooms }} Baños</span>
+                    <span>{{ property.area }} m²</span>
+                    {% if property.parking_spaces > 0 %}
+                    <span>{{ property.parking_spaces }} Estacionamientos</span>
+                    {% endif %}
+                </div>
+                <div class="property-actions">
+                    <a href="{% url 'detalle_propiedad' property.id %}" class="btn btn-info">
+                        <i class="fas fa-eye"></i> Ver Detalles
+                    </a>
+                    <a href="{% url 'edit_property' property.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'delete_property' property.id %}" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </a>
+                    <form method="post" action="{% url 'toggle_property_visibility' %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="property_id" value="{{ property.id }}">
+                        <!-- Next: vuelve a esta misma página -->
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <button type="submit"
+                            class="btn {% if property.is_visible %}btn-warning{% else %}btn-secondary{% endif %}">
+                            {% if property.is_visible %}
+                            <i class="fas fa-eye-slash"></i> Ocultar
+                            {% else %}
+                            <i class="fas fa-eye"></i> Mostrar
+                            {% endif %}
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="no-properties">
+            <p>No tienes propiedades registradas. ¡Agrega una nueva propiedad!</p>
+        </div>
         {% endif %}
+
     </main>
 </div>
 {% endblock %}

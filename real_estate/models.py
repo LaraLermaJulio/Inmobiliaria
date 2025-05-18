@@ -38,6 +38,7 @@ class Property(models.Model):
     has_security = models.BooleanField(default=False, verbose_name="Seguridad 24h")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Última Actualización")
+    is_visible = models.BooleanField(default=True, verbose_name="Visible en búsqueda")
     
     # Map coordinates
     latitude = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True, verbose_name="Latitud")

@@ -25,4 +25,6 @@ urlpatterns = [
     path('my-property-contacts/', views.property_contacts, name='property_contacts'),
     path('detalle-propiedad/<int:property_id>/pdf/', views.generate_property_pdf, name='property_pdf'),
     path('estadisticas/pdf/', estadisticas_pdf, name='estadisticas_pdf'),
+    path('toggle-property-visibility/', views.toggle_property_visibility, name='toggle_property_visibility'),
+    
 ]

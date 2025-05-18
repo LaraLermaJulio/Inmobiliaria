@@ -9,14 +9,15 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
     {% block extra_css %}{% endblock %}
-    <!-- Add these lines in the head section, before the closing </head> tag -->
     <link rel="stylesheet" href="{% static 'css/discount_alerts.css' %}">
     <script src="{% static 'js/discount_notifications.js' %}"></script>
 </head>
 <body {% block body_class %}{% endblock %}>
     {% block navbar %}
     <nav class="navbar">
-        <div class="logo">Inmobiliaria</div>
+        <!-- Convertimos el logo en un enlace -->
+        <a href="{% url 'index' %}" class="logo">Inmobiliaria</a>
+
         <div class="hamburger">
             <span></span>
             <span></span>
@@ -30,7 +31,7 @@
                 {% if user.is_authenticated %}
                 <div class="profile-dropdown">
                     <a href="{% url 'my_properties' %}">Mis Propiedades</a>
-                    <hr>
+                    <a href="{% url 'estadisticas_vistas' %}">Estadísticas</a>
                     <form method="post" action="{% url 'logout' %}" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit">Cerrar Sesión</button>
@@ -49,8 +50,6 @@
             <li><a href="{% url 'contacto' %}">Contacto</a></li>
             {% if not user.is_authenticated %}
                 <li><a href="{% url 'login' %}">Iniciar Sesión</a></li>
-            {% else %}
-               
             {% endif %}
         </ul>
         
@@ -61,7 +60,7 @@
             {% if user.is_authenticated %}
             <div class="profile-dropdown">
                 <a href="{% url 'my_properties' %}">Mis Propiedades</a>
-                <hr>
+                <a href="{% url 'estadisticas_vistas' %}">Estadísticas</a>
                 <form method="post" action="{% url 'logout' %}" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Cerrar Sesión</button>
@@ -76,8 +75,7 @@
     </nav>
     {% endblock %}
 
-    {% block content %}
-    {% endblock %}
+    {% block content %}{% endblock %}
     
     {% block scripts %}
     <script src="{% static 'js/hamburger.js' %}"></script>
