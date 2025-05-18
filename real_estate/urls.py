@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import estadisticas_pdf
 
 urlpatterns = [
     # Existing URLs
@@ -22,4 +23,6 @@ urlpatterns = [
     path('api/discounted-properties/', views.discounted_properties, name='discounted_properties'),
     path('property/<int:property_id>/contact/', views.property_contact, name='property_contact'),
     path('my-property-contacts/', views.property_contacts, name='property_contacts'),
+    path('detalle-propiedad/<int:property_id>/pdf/', views.generate_property_pdf, name='property_pdf'),
+    path('estadisticas/pdf/', estadisticas_pdf, name='estadisticas_pdf'),
 ]

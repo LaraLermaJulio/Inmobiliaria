@@ -20,6 +20,16 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+from django.http import HttpResponse, FileResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from io import BytesIO
+from reportlab.lib.units import inch
+import json
+import io
 
 def index(request):
     featured_properties = Property.objects.filter(is_featured=True)[:5]
@@ -273,6 +283,17 @@ def property_detail(request, property_id):
     # Incrementar el contador de vistas
     property.views += 1
     property.save()
+    
+    # Registrar la vista en el mes actual
+    current_month = timezone.now().strftime('%Y-%m')
+    
+    # Aquí deberías tener un modelo para registrar vistas por mes
+    # Por ejemplo: PropertyViewMonth
+    # PropertyViewMonth.objects.create_or_update(
+    #     property=property,
+    #     month=current_month,
+    #     views=F('views') + 1
+    # )
     
     # Get property images using the same pattern as in ventas/renta views
     property_images = property.images.all()
@@ -661,6 +682,240 @@ from datetime import datetime, timedelta
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 
+@login_required
+def estadisticas(request):
+    """Vista para mostrar estadísticas de vistas de propiedades"""
+    # Obtener propiedades del usuario actual
+    properties = Property.objects.filter(owner=request.user)
+    
+    # Obtener las 5 propiedades más vistas
+    top_properties = properties.order_by('-views')[:5]
+    
+    # Crear datos de vistas mensuales
+    monthly_views_data = []
+    
+    # Obtener el mes actual
+    current_month = timezone.now().strftime('%Y-%m')
+    current_month_date = f"{current_month}-01"  # Formato YYYY-MM-DD para JavaScript
+    
+    # Sumar todas las vistas de las propiedades para el mes actual
+    total_views = properties.aggregate(Sum('views'))['views__sum'] or 0
+    
+    # Agregar el mes actual con el total de vistas
+    monthly_views_data.append({
+        'month': current_month_date,
+        'total_views': total_views
+    })
+    
+    # Imprimir para depuración
+    print("Datos mensuales enviados al frontend:", monthly_views_data)
+    
+    context = {
+        'top_properties': top_properties,
+        'monthly_views': json.dumps(monthly_views_data, cls=DjangoJSONEncoder)
+    }
+    
+    return render(request, 'real_estate/estadisticas.html', context)
+
+
+# Agregar esta nueva vista para generar el PDF
+def estadisticas_pdf(request):
+    # Crear un objeto de respuesta HTTP con el tipo de contenido PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="estadisticas_inmobiliaria.pdf"'
+    
+    # Crear el documento PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+    
+    # Estilos para el documento
+    styles = getSampleStyleSheet()
+    title_style = styles['Heading1']
+    subtitle_style = styles['Heading2']
+    normal_style = styles['Normal']
+    
+    # Título del documento
+    elements.append(Paragraph("Relación de vistas de propiedades", title_style))
+    elements.append(Spacer(1, 20))
+    
+    # Obtener los datos de propiedades (ajusta esto según tu modelo)
+    from .models import Property
+    
+    # Datos para la tabla
+    properties = Property.objects.all()
+    data = [['Propiedad', 'Ubicación', 'Vistas']]
+    
+    for prop in properties:
+        # Usar el campo views directamente del modelo Property
+        views_count = prop.views
+        data.append([prop.title, f"{prop.city}, {prop.state}", views_count])
+    
+    # Crear la tabla
+    table = Table(data, colWidths=[200, 200, 100])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.green),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    
+    elements.append(table)
+    
+    # Construir el PDF
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    
+    return response
+    
+    # Add main image to each property
+    for prop in properties:
+        main_images = prop.images.filter(is_main=True)
+        if main_images.exists():
+            prop.main_image = main_images.first()
+        else:
+            prop.main_image = prop.images.first() if prop.images.exists() else None
+    
+    context = {
+        'properties': properties,
+        'query': query,
+    }
+    
+    return render(request, 'real_estate/search_results.html', context)
+
+
+# Add the discounted_properties function at the module level
+def discounted_properties(request):
+    """API endpoint to get properties with discounts"""
+    properties = Property.objects.filter(discount_percentage__gt=0)
+    
+    properties_data = []
+    for prop in properties:
+        discounted_price = float(prop.price) - (float(prop.price) * float(prop.discount_percentage) / 100)
+        properties_data.append({
+            'id': prop.id,
+            'title': prop.title,
+            'price': float(prop.price),
+            'discount_percentage': float(prop.discount_percentage),
+            'discounted_price': round(discounted_price, 2)
+        })
+    
+    return JsonResponse({'properties': properties_data})
+
+
+@login_required
+def call_tracking_dashboard(request):
+    """View to display a list of properties with call statistics"""
+    # Get properties owned by the current user
+    properties = Property.objects.filter(owner=request.user)
+    
+    # Get call statistics for each property
+    property_stats = []
+    for property in properties:
+        # In a real implementation, you would have a PropertyCall model
+        # For now, we'll create dummy data
+        property_stats.append({
+            'property': property,
+            'total_calls': 0,
+            'completed_calls': 0,
+            'missed_calls': 0,
+            'last_call': None
+        })
+    
+    context = {
+        'property_stats': property_stats
+    }
+    
+    return render(request, 'real_estate/call_tracking_list.html', context)
+
+
+def debug_search(request):
+    """A temporary debug view to check if properties exist"""
+    query = "Celaya"
+    
+    ventas = Property.objects.filter(
+        Q(title__icontains=query) | 
+        Q(description__icontains=query) |
+        Q(address__icontains=query) |
+        Q(city__icontains=query),
+        listing_type='venta'
+    )
+    
+    rentas = Property.objects.filter(
+        Q(title__icontains=query) | 
+        Q(description__icontains=query) |
+        Q(address__icontains=query) |
+        Q(city__icontains=query),
+        listing_type='renta'
+    )
+    
+    data = {
+        'query': query,
+        'ventas_count': ventas.count(),
+        'rentas_count': rentas.count(),
+        'ventas': [{'id': p.id, 'title': p.title, 'city': p.city} for p in ventas],
+        'rentas': [{'id': p.id, 'title': p.title, 'city': p.city} for p in rentas],
+    }
+    
+    return JsonResponse(data)
+
+
+@require_POST
+def property_contact(request, property_id):
+    """Handle property contact form submissions"""
+    try:
+        property_obj = Property.objects.get(id=property_id)
+        
+        # Get form data
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        phone = request.POST.get('phone', '')
+        message = request.POST.get('message', '')
+        
+        # Create contact record
+        contact = PropertyContact.objects.create(
+            property=property_obj,
+            name=name,
+            email=email,
+            phone=phone,
+            message=message
+        )
+        
+        return JsonResponse({'success': True, 'message': 'Mensaje enviado correctamente'})
+    except Property.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Propiedad no encontrada'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+# Añadir una vista para mostrar los contactos de las propiedades del usuario
+@login_required
+def property_contacts(request):
+    """View to display contacts for properties owned by the current user"""
+    # Get properties owned by the current user
+    user_properties = Property.objects.filter(owner=request.user)
+    
+    # Get contacts for those properties
+    contacts = PropertyContact.objects.filter(property__in=user_properties)
+    
+    context = {
+        'contacts': contacts
+    }
+    
+    return render(request, 'real_estate/property_contacts.html', context)
+
+
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
 def estadisticas_vistas(request):
     # Obtener datos para el gráfico mensual
     year = datetime.now().year
@@ -687,3 +942,320 @@ def estadisticas_vistas(request):
         'top_properties': top_properties,
     }
     return render(request, 'real_estate/estadisticas.html', context)
+
+
+# Agregar esta nueva vista para generar el PDF
+def estadisticas_pdf(request):
+    # Crear un objeto de respuesta HTTP con el tipo de contenido PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="estadisticas_inmobiliaria.pdf"'
+    
+    # Crear el documento PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+    
+    # Estilos para el documento
+    styles = getSampleStyleSheet()
+    title_style = styles['Heading1']
+    subtitle_style = styles['Heading2']
+    normal_style = styles['Normal']
+    
+    # Título del documento
+    elements.append(Paragraph("Relación de vistas de propiedades", title_style))
+    elements.append(Spacer(1, 20))
+    
+    # Obtener los datos de propiedades (ajusta esto según tu modelo)
+    from .models import Property
+    
+    # Datos para la tabla
+    properties = Property.objects.all()
+    data = [['Propiedad', 'Ubicación', 'Vistas']]
+    
+    for prop in properties:
+        # Usar el campo views directamente del modelo Property
+        views_count = prop.views
+        data.append([prop.title, f"{prop.city}, {prop.state}", views_count])
+    
+    # Crear la tabla
+    table = Table(data, colWidths=[200, 200, 100])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.green),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    
+    elements.append(table)
+    
+    # Construir el PDF
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    
+    return response
+    
+    # Add main image to each property
+    for prop in properties:
+        main_images = prop.images.filter(is_main=True)
+        if main_images.exists():
+            prop.main_image = main_images.first()
+        else:
+            prop.main_image = prop.images.first() if prop.images.exists() else None
+    
+    context = {
+        'properties': properties,
+        'query': query,
+    }
+    
+    return render(request, 'real_estate/search_results.html', context)
+
+
+# Add the discounted_properties function at the module level
+def discounted_properties(request):
+    """API endpoint to get properties with discounts"""
+    properties = Property.objects.filter(discount_percentage__gt=0)
+    
+    properties_data = []
+    for prop in properties:
+        discounted_price = float(prop.price) - (float(prop.price) * float(prop.discount_percentage) / 100)
+        properties_data.append({
+            'id': prop.id,
+            'title': prop.title,
+            'price': float(prop.price),
+            'discount_percentage': float(prop.discount_percentage),
+            'discounted_price': round(discounted_price, 2)
+        })
+    
+    return JsonResponse({'properties': properties_data})
+
+
+@login_required
+def call_tracking_dashboard(request):
+    """View to display a list of properties with call statistics"""
+    # Get properties owned by the current user
+    properties = Property.objects.filter(owner=request.user)
+    
+    # Get call statistics for each property
+    property_stats = []
+    for property in properties:
+        # In a real implementation, you would have a PropertyCall model
+        # For now, we'll create dummy data
+        property_stats.append({
+            'property': property,
+            'total_calls': 0,
+            'completed_calls': 0,
+            'missed_calls': 0,
+            'last_call': None
+        })
+    
+    context = {
+        'property_stats': property_stats
+    }
+    
+    return render(request, 'real_estate/call_tracking_list.html', context)
+
+
+def debug_search(request):
+    """A temporary debug view to check if properties exist"""
+    query = "Celaya"
+    
+    ventas = Property.objects.filter(
+        Q(title__icontains=query) | 
+        Q(description__icontains=query) |
+        Q(address__icontains=query) |
+        Q(city__icontains=query),
+        listing_type='venta'
+    )
+    
+    rentas = Property.objects.filter(
+        Q(title__icontains=query) | 
+        Q(description__icontains=query) |
+        Q(address__icontains=query) |
+        Q(city__icontains=query),
+        listing_type='renta'
+    )
+    
+    data = {
+        'query': query,
+        'ventas_count': ventas.count(),
+        'rentas_count': rentas.count(),
+        'ventas': [{'id': p.id, 'title': p.title, 'city': p.city} for p in ventas],
+        'rentas': [{'id': p.id, 'title': p.title, 'city': p.city} for p in rentas],
+    }
+    
+    return JsonResponse(data)
+
+
+@require_POST
+def property_contact(request, property_id):
+    """Handle property contact form submissions"""
+    try:
+        property_obj = Property.objects.get(id=property_id)
+        
+        # Get form data
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        phone = request.POST.get('phone', '')
+        message = request.POST.get('message', '')
+        
+        # Create contact record
+        contact = PropertyContact.objects.create(
+            property=property_obj,
+            name=name,
+            email=email,
+            phone=phone,
+            message=message
+        )
+        
+        return JsonResponse({'success': True, 'message': 'Mensaje enviado correctamente'})
+    except Property.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Propiedad no encontrada'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+# Añadir una vista para mostrar los contactos de las propiedades del usuario
+@login_required
+def property_contacts(request):
+    """View to display contacts for properties owned by the current user"""
+    # Get properties owned by the current user
+    user_properties = Property.objects.filter(owner=request.user)
+    
+    # Get contacts for those properties
+    contacts = PropertyContact.objects.filter(property__in=user_properties)
+    
+    context = {
+        'contacts': contacts
+    }
+    
+    return render(request, 'real_estate/property_contacts.html', context)
+
+
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
+def estadisticas_vistas(request):
+    # Obtener datos para el gráfico mensual
+    year = datetime.now().year
+    monthly_views = Property.objects.annotate(
+        month=TruncMonth('created_at')
+    ).values('month').annotate(
+        total_views=Sum('views')  # Ahora Sum está definido
+    ).order_by('month')
+
+    # Convertir los datos a un formato que pueda ser serializado
+    monthly_data = [
+        {
+            'month': item['month'].strftime('%Y-%m-%d'),
+            'total_views': item['total_views'] or 0
+        }
+        for item in monthly_views
+    ]
+
+    # Obtener las propiedades más vistas
+    top_properties = Property.objects.order_by('-views')[:10]
+
+    context = {
+        'monthly_views': json.dumps(monthly_data, cls=DjangoJSONEncoder),
+        'top_properties': top_properties,
+    }
+    return render(request, 'real_estate/estadisticas.html', context)
+
+
+# Agregar esta nueva vista para generar el PDF
+def generate_property_pdf(request, property_id):
+    # Obtener la propiedad
+    property = get_object_or_404(Property, id=property_id)
+    
+    # Crear un buffer para recibir los datos del PDF
+    buffer = io.BytesIO()
+    
+    # Crear el documento PDF
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    title_style = styles['Heading1']
+    subtitle_style = styles['Heading2']
+    normal_style = styles['Normal']
+    
+    # Título
+    elements.append(Paragraph(property.title, title_style))
+    elements.append(Spacer(1, 0.25*inch))
+    
+    # Precio
+    price_text = f"${property.price} MXN"
+    if property.listing_type == 'renta':
+        price_text += "/mes"
+    elements.append(Paragraph(f"Precio: {price_text}", subtitle_style))
+    elements.append(Spacer(1, 0.1*inch))
+    
+    # Características principales
+    elements.append(Paragraph("Características Principales:", subtitle_style))
+    
+    data = [
+        ["Superficie", f"{property.area} m²"],
+        ["Recámaras", str(property.bedrooms)],
+        ["Baños", str(property.bathrooms)],
+    ]
+    
+    if property.parking_spaces > 0:
+        data.append(["Estacionamiento", f"{property.parking_spaces} autos"])
+    
+    data.append(["Tipo", property.get_property_type_display()])
+    
+    # Crear tabla
+    table = Table(data, colWidths=[2*inch, 3*inch])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (0, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ('BACKGROUND', (1, 0), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+    
+    elements.append(table)
+    elements.append(Spacer(1, 0.2*inch))
+    
+    # Descripción
+    elements.append(Paragraph("Descripción:", subtitle_style))
+    elements.append(Paragraph(property.description, normal_style))
+    elements.append(Spacer(1, 0.2*inch))
+    
+    # Dirección
+    elements.append(Paragraph("Ubicación:", subtitle_style))
+    elements.append(Paragraph(property.address, normal_style))
+    elements.append(Paragraph(f"{property.city}, {property.state}", normal_style))
+    
+    # Construir el PDF
+    doc.build(elements)
+    
+    # Preparar la respuesta
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f'propiedad-{property.id}.pdf')
+
+
+@login_required
+@require_POST
+def reset_views(request):
+    try:
+        # Obtener propiedades del usuario actual
+        properties = Property.objects.filter(owner=request.user)
+        
+        # Reiniciar vistas a 0
+        properties.update(views=0)
+        
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
