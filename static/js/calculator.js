@@ -37,3 +37,58 @@ function calculateMortgage(propertyPrice) {
     `;
     resultElement.classList.add('active');
 }
+
+// Función para validar campos numéricos
+function validateNumericInput(input, min, max) {
+    // Eliminar caracteres no numéricos (excepto punto decimal)
+    input.value = input.value.replace(/[^\d.]/g, '');
+    
+    // Asegurar que solo haya un punto decimal
+    const parts = input.value.split('.');
+    if (parts.length > 2) {
+        input.value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    // Convertir a número para validar rango
+    let value = parseFloat(input.value);
+    
+    // Si no es un número, establecer a valor mínimo
+    if (isNaN(value)) {
+        input.value = min;
+        return;
+    }
+    
+    // Validar rango
+    if (value < min) {
+        input.value = min;
+    } else if (value > max) {
+        input.value = max;
+    }
+}
+
+// Inicializar validaciones cuando el DOM esté cargado
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener referencias a los campos
+    const downPaymentInput = document.getElementById('down-payment');
+    const loanTermInput = document.getElementById('loan-term');
+    const interestRateInput = document.getElementById('interest-rate');
+    
+    // Si los elementos existen, agregar validaciones
+    if (downPaymentInput) {
+        downPaymentInput.addEventListener('input', function() {
+            validateNumericInput(this, 0, 100);
+        });
+    }
+    
+    if (loanTermInput) {
+        loanTermInput.addEventListener('input', function() {
+            validateNumericInput(this, 1, 30);
+        });
+    }
+    
+    if (interestRateInput) {
+        interestRateInput.addEventListener('input', function() {
+            validateNumericInput(this, 0, 100);
+        });
+    }
+});
