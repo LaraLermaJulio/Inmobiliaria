@@ -180,7 +180,7 @@
                 </div>
                 <div class="calculator-input">
                     <label for="interest-rate">Tasa de interés anual (%)</label>
-                    <input type="number" id="interest-rate" min="1" max="20" step="0.1" value="7.5">
+                    <input type="number" id="interest-rate" min="0" max="20" step="0.1" value="7.5">
                 </div>
             </div>
             <button onclick="calculateMortgage({{ property.price }})" class="contact-button calculate-button">Calcular Hipoteca</button>
@@ -343,9 +343,35 @@
 <script>
     // Función para calcular la hipoteca
     function calculateMortgage(propertyPrice) {
-        const downPaymentPercent = parseFloat(document.getElementById('down-payment').value);
-        const loanTerm = parseInt(document.getElementById('loan-term').value);
-        const interestRate = parseFloat(document.getElementById('interest-rate').value);
+        // Obtener valores de los campos
+        let downPaymentPercent = parseFloat(document.getElementById('down-payment').value);
+        let loanTerm = parseInt(document.getElementById('loan-term').value);
+        let interestRate = parseFloat(document.getElementById('interest-rate').value);
+        
+        // Validar que los valores estén dentro de rangos aceptables
+        if (isNaN(downPaymentPercent) || downPaymentPercent < 0 ) {
+            downPaymentPercent = 0;
+            document.getElementById('down-payment').value = 0;
+            alert("El enganche no puede ser negativo. Se ha establecido a 0%.");
+        }
+        
+        if (downPaymentPercent > 100) {
+            downPaymentPercent = 100;
+            document.getElementById('down-payment').value = 100;
+            alert("El enganche no puede ser mayor al 100% del valor de la propiedad. Se ha establecido a 100%.");
+        }
+        
+        if (isNaN(interestRate) || interestRate < 0) {
+            interestRate = 0;
+            document.getElementById('interest-rate').value = 0;
+            alert("La tasa de interés no puede ser negativa. Se ha establecido a 0%.");
+        }
+        
+        if (isNaN(loanTerm) || loanTerm <= 0) {
+            loanTerm = 1;
+            document.getElementById('loan-term').value = 1;
+            alert("El plazo debe ser al menos de 1 año. Se ha establecido a 1 año.");
+        }
         
         // Calcular el enganche en cantidad
         const downPayment = (downPaymentPercent / 100) * propertyPrice;
@@ -359,9 +385,14 @@
         // Calcular el número de pagos
         const numberOfPayments = loanTerm * 12;
         
-        // Calcular el pago mensual
-        const monthlyPayment = (loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) / 
+        // Calcular el pago mensual (evitar división por cero si la tasa es 0)
+        let monthlyPayment = 0;
+        if (interestRate === 0) {
+            monthlyPayment = loanAmount / numberOfPayments;
+        } else {
+            monthlyPayment = (loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) / 
                               (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
+        }
         
         // Calcular el costo total
         const totalCost = monthlyPayment * numberOfPayments;
@@ -395,4 +426,6 @@
     });
 </script>
 {% endblock %}
+
+
 
